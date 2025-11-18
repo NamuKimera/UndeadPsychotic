@@ -29,8 +29,9 @@ class Persona extends GameObject {
 
     this.aceleracionMaxima = 0.2;
     this.velocidadMaxima = 3;
-    this.amigos = [];
-
+    this.crearCajitaDeMatterJS();
+    this.aplicameFuerza();
+    
     // this.crearSombra();
     // this.esperarAQueTengaSpriteCargado(() => {this.crearGloboDeDialogo(); this.crearFSMparaAnimacion();});
   }
@@ -47,15 +48,23 @@ class Persona extends GameObject {
   }
 
   meEstoyChocandoContraLaParedIzquierda() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 509, 295, 100, 900)
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 509, 295, 100, 950)
   }
 
   meEstoyChocandoContraLaParedDerecha() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1409, 295, 1900, 900)
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1409, 295, 1800, 950)
   }
 
   meEstoyChocandoContraLaParedArriba() {
     return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 509, 295, 1409, 295)
+  }
+
+  meEstoyChocandoContraLaParedAbajo() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 100, 950, 1800, 950)
+  }
+
+  meEstoyChocandoConAlgunaPared() {
+    return this.meEstoyChocandoContraLaParedIzquierda() || this.meEstoyChocandoContraLaParedDerecha() || this.meEstoyChocandoContraLaParedAbajo() || this.meEstoyChocandoContraLaParedArriba()
   }
 
   noChocarConLaParedIzquierda() {
@@ -79,10 +88,40 @@ class Persona extends GameObject {
     }
   }
 
-  noChocarConNingunaPared(){
+  noChocarConLaParedAbajo() {
+    if (this.meEstoyChocandoContraLaParedAbajo()) {
+      this.velocidad.y = -100
+      console.log(this.nombre, "choco con pared abajo")
+    }
+  }
+
+  noChocarConNingunaPared() {
     this.noChocarConLaParedIzquierda()
     this.noChocarConLaParedDerecha()
     this.noChocarConLaParedArriba()
+    this.noChocarConLaParedAbajo()
+  }
+
+  retrocederSiChocoConAlgunaPared() {
+    if (this.meEstoyChocandoConAlgunaPared()) {
+      
+    }
+  }
+
+  aplicameFuerza(x, y) {
+    Matter.Body.applyForce(this.cajita, { x: 0.5, y: 0.5 }, { x: x, y: y });
+  }
+
+  crearCajitaDeMatterJS() {
+    this.cajita = Matter.Bodies.rectangle(
+      this.posicion.x,
+      this.posicion.y,
+      this.ancho * 0.8,
+      this.alto * 0.8,
+      { restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
+    );
+    this.cajita.angle = Math.random() * 3;
+    Matter.Composite.add(this.juego.engine.world, [this.cajita]);
   }
 
   crearFSMparaAnimacion() {
@@ -154,7 +193,7 @@ class Persona extends GameObject {
       });
       const distancia = Math.sqrt(
         vectorRepulsion.x * vectorRepulsion.x +
-          vectorRepulsion.y * vectorRepulsion.y
+        vectorRepulsion.y * vectorRepulsion.y
       );
 
       // Calcular fuerza inversamente proporcional a la distancia
@@ -172,7 +211,7 @@ class Persona extends GameObject {
     this.aceleracion.x += fuerzaRepulsionTotal.x * this.factorRepelerSuavementeObstaculos;
     this.aceleracion.y += fuerzaRepulsionTotal.y * this.factorRepelerSuavementeObstaculos;
   }
-  
+
   percibirEntorno() {
     //todas las personas en mi rango de vision
     this.personasCerca = this.getPersonasCerca();
@@ -196,7 +235,7 @@ class Persona extends GameObject {
       this.aceleracion.y += vectorRepulsion.y;
     }
   }
-  
+
   calcularAnguloYVelocidadLineal() {
     /**
      * CÁLCULO DE PARÁMETROS DE ANIMACIÓN
@@ -242,7 +281,7 @@ class Persona extends GameObject {
     this.aceleracion.y += this.factorAlineacion * vectorNuevo.y;
   }
 
-  
+
 
   /*cohesion() {
     let cont = 0;

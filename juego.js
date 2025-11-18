@@ -11,11 +11,88 @@ class Juego {
     this.altoDelMapa = 1080;
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.initPIXI();
+    this.initMatterJS();
   }
 
   updateDimensions() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+  }
+
+  initMatterJS() {
+    // module aliases
+    var Engine = Matter.Engine,
+      Render = Matter.Render,
+      Runner = Matter.Runner,
+      Bodies = Matter.Bodies,
+      Composite = Matter.Composite;
+
+    // create an engine
+    this.engine = Engine.create();
+
+    // create a renderer
+    // this.matterRenderer = Render.create({
+    //   element: document.body,
+    //   engine: this.engine,
+    // });
+
+    // create two boxes and a ground
+    // var boxA = Bodies.rectangle(400, 200, 80, 80);
+    // var boxB = Bodies.rectangle(450, 50, 80, 80);
+
+    // Crear bordes de la pantalla
+    this.piso = Bodies.rectangle(
+      this.width / 2,
+      this.height + 30,
+      this.width,
+      60,
+      {
+        isStatic: true,
+        friction: 1,
+      }
+    );
+
+    this.techo = Bodies.rectangle(this.width / 2, -30, this.width, 60, {
+      isStatic: true,
+      friction: 1,
+    });
+
+    this.paredIzquierda = Bodies.rectangle(
+      -30,
+      this.height / 2,
+      60,
+      this.height,
+      {
+        isStatic: true,
+        friction: 1,
+      }
+    );
+
+    this.paredDerecha = Bodies.rectangle(
+      this.width + 30,
+      this.height / 2,
+      60,
+      this.height,
+      {
+        isStatic: true,
+        friction: 1,
+      }
+    );
+
+    // add all of the bodies to the world
+    Composite.add(this.engine.world, [
+      this.piso,
+      this.techo,
+      this.paredIzquierda,
+      this.paredDerecha,
+    ]);
+
+    // run the renderer
+    if (this.matterRenderer) Render.run(this.matterRenderer);
+    // create runner
+    this.matterRunner = Runner.create();
+    // run the engine
+    Runner.run(this.matterRunner, this.engine);
   }
 
   //async indica q este metodo es asyncronico, es decir q puede usar "await"
@@ -82,13 +159,13 @@ class Juego {
 
   crearPalmera() {
     const x = 800;
-    const y = 725;
+    const y = 600;
     const local = new Palmera(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(local);
   }
 
   crearFuente() {
-    const x = 1600;
+    const x = 1400;
     const y = 800;
     const fuente = new Fuente(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(fuente);
@@ -96,8 +173,8 @@ class Juego {
 
   crearSillas() {
     const x = 560;
-    const y = 800;
-    const silla = new Silla(x, y, this, 0.5, 0.5);
+    const y = 600;
+    const silla = new Silla(x, y, this, 0.7, 0.7);
     this.objetosInanimados.push(silla);
   }
 
