@@ -11,7 +11,7 @@ class Asesino extends Persona {
     this.factorIrAlTarget = 0.5;
     this.distanciaParaEmpezarABajarLaVelocidad = this.radio * 20;
     this.distanciaAlTarget = Infinity;
-    juego.targetCamara = this.asesino;
+    juego.targetCamara = this.protagonista;
     this.asignarTarget(this.juego.mouse);
   }
 

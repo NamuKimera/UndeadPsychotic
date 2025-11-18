@@ -3,11 +3,45 @@
 <head>
 
     <style>
+        @font-face {
+            font-family: "PixelifySans";
+            src: url("assets/PixelifySans-Regular.ttf") format("truetype");
+        }
+
+        body * {
+            font-family: "PixelifySans", sans-serif;
+        }
+
         body {
-            margin: 0px
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+
+        html {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #controles {
+            display: flex;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            gap: 10px;
+        }
+
+        button {
+            font-size: 20px;
         }
     </style>
-    <!-- 1 importamos pixi -->
+    <!-- 1 importamos Pixi y Matter -->
     <script src="pixi.js"></script>
     <script src="matter.js"></script>
     <!-- 2 importamos las utilidades y las clases de los objetos del juego -->
@@ -15,6 +49,22 @@
     <script src="gameObject.js"></script>
     <script src="persona.js"></script>
     <script src="entidadEstatica.js"></script>
+    <script src="animatedCharacter.js"></script>
+    <script src="ui.js"></script>
+    <!-- 3 importamos las FSM del juego -->
+    <script src="fsm/fsm.js"></script>
+    <script src="fsm/fsm_state.js"></script>
+    <script src="fsm/estados_de_animacion/idle_animation_state.js"></script>
+    <script src="fsm/estados_de_animacion/walk_animation_state.js"></script>
+    <script src="fsm/estados_de_animacion/run_animation_state.js"></script>
+    <script src="fsm/estados_de_animacion/pegar_animation_state.js"></script>
+    <script src="fsm/estados_de_animacion/convertirse_animation_state.js"></script>
+    <script src="fsm/estados_de_comportamiento/amigo_idle_behavior_state.js"></script>
+    <script src="fsm/estados_de_comportamiento/enemigo_idle_behavior_state.js"></script>
+    <script src="fsm/estados_de_comportamiento/amigo_en_combate_behavior_state.js"></script>
+    <script src="fsm/estados_de_comportamiento/enemigo_en_combate_behavior_state.js"></script>
+    <script src="fsm/estados_de_comportamiento/pasado_de_bando_behavior_state.js"></script>
+    <script src="gsap.js"></script>
     <!-- y por ultimo cada clase de los NPC's y objetos -->
     <script src="local.js"></script>
     <script src="fuente.js"></script>

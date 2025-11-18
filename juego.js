@@ -1,22 +1,27 @@
+const Z_INDEX = {
+  containerBG: 0,
+  graficoSombrasProyectadas: 1,
+  containerIluminacion: 2,
+  containerPrincipal: 3,
+  spriteAmarilloParaElAtardecer: 4,
+  containerUI: 5,
+};
+
 class Juego {
   pixiApp;
   personas = [];
   objetosInanimados = [];
+  protagonista;
   width;
   height;
 
   constructor() {
     this.updateDimensions();
-    this.anchoDelMapa = 1920;
-    this.altoDelMapa = 1080;
+    this.anchoDelMapa = 5000;
+    this.altoDelMapa = 5000;
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.initPIXI();
     this.initMatterJS();
-  }
-
-  updateDimensions() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
   }
 
   initMatterJS() {
@@ -100,7 +105,7 @@ class Juego {
     //creamos la aplicacion de pixi y la guardamos en la propiedad pixiApp
     this.pixiApp = new PIXI.Application();
 
-    this.pixiApp.stage.name = "el stage";
+    this.pixiApp.stage.label = "el stage";
 
     //esto es para que funcione la extension de pixi
     globalThis.__PIXI_APP__ = this.pixiApp;
@@ -126,6 +131,12 @@ class Juego {
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
     this.crearNivel();
+    this.ui = new UI(this);
+  }
+
+  updateDimensions() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
   }
 
   async crearNivel() {
@@ -137,6 +148,7 @@ class Juego {
     this.crearSillas();
     this.crearPalmera();
     this.crearAsesino();
+    this.targetCamara = this.protagonista;
     this.crearCiudadanos(40);
     this.crearPolicias(10);
   }
@@ -184,6 +196,7 @@ class Juego {
     const animacionesProtagonista = await PIXI.Assets.load("assets/personajes/img/asesino.json");
     const protagonista = new Asesino(animacionesProtagonista, x, y, this);
     this.personas.push(protagonista);
+    this.protagonista = protagonista;
   }
 
   async crearCiudadanos(cant) {
@@ -191,8 +204,8 @@ class Juego {
       const x = 0.5 * this.width;
       const y = 0.5 * this.height;
       const animacionesCiudadano = await PIXI.Assets.load("assets/personajes/img/ciudadano.json");
-      const protagonista = new Ciudadano(animacionesCiudadano, x, y, this);
-      this.personas.push(protagonista);
+      const civiles = new Ciudadano(animacionesCiudadano, x, y, this);
+      this.personas.push(civiles);
     }
   }
 
@@ -201,25 +214,49 @@ class Juego {
       const x = 0.5 * this.width;
       const y = 0.5 * this.height;
       const animacionesPolicia = await PIXI.Assets.load("assets/personajes/img/policia.json");
-      const protagonista = new Policia(animacionesPolicia, x, y, this);
-      this.personas.push(protagonista);
+      const policia = new Policia(animacionesPolicia, x, y, this);
+      this.personas.push(policia);
     }
   }
 
+  getPersonaRandom() {
+    return this.personas[Math.floor(this.personas.length * Math.random())];
+  }
+
+  agregarListenersDeTeclado() {
+    window.onkeydown = (event) => {
+      this.teclado[event.key.toLowerCase()] = true;
+      if (event.key == "1") {
+        this.crearUnAmigo(this.mouse.posicion.x, this.mouse.posicion.y);
+      } else if (parseInt(event.key)) {
+        this.crearUnEnemigo(
+          parseInt(event.key),
+          this.mouse.posicion.x,
+          this.mouse.posicion.y
+        );
+      }
+    };
+    window.onkeyup = (event) => {
+      this.teclado[event.key.toLowerCase()] = false;
+      if (event.key.toLowerCase() == "u") {
+        this.hacerQueLaCamaraSigaAalguienRandom();
+      }
+    };
+  }
+
+  hacerQueLaCamaraSigaAalguienRandom() {
+    this.targetCamara = this.getPersonaRandom();
+  }
+
   agregarInteractividadDelMouse() {
-    // Escuchar el evento mousemove
     this.pixiApp.canvas.onmousemove = (event) => {
       this.mouse.posicion = { x: event.x, y: event.y };
     };
   }
 
-  getConejitoRandom() {
-    return this.personas[Math.floor(this.personas.length * Math.random())];
-  }
-
   asignarTargets() {
     for (let unaPersona of this.personas) {
-      unaPersona.asignarTarget(this.getConejitoRandom());
+      unaPersona.asignarTarget(this.getPersonaRandom());
     }
   }
 
@@ -231,7 +268,7 @@ class Juego {
 
   asignarPerseguidorRandomATodos() {
     for (let unaPersona of this.personas) {
-      unaPersona.perseguidor = this.getConejitoRandom();
+      unaPersona.perseguidor = this.getPersonaRandom();
     }
   }
 
@@ -241,6 +278,48 @@ class Juego {
     }
   }
 
+  hacerQLaCamaraSigaAAlguien() {
+    if (!this.targetCamara) return;
+    // Ajustar la posición considerando el zoom actual
+    let targetX = -this.targetCamara.posicion.x * this.zoom + this.width / 2;
+    let targetY = -this.targetCamara.posicion.y * this.zoom + this.height / 2;
+
+    const x = (targetX - this.containerPrincipal.x) * 0.1;
+    const y = (targetY - this.containerPrincipal.y) * 0.1;
+
+    this.moverContainerPrincipalA(
+      this.containerPrincipal.x + x,
+      this.containerPrincipal.y + y
+    );
+  }
+
+  moverContainerPrincipalA(x, y) {
+    this.containerPrincipal.x = x;
+    this.containerPrincipal.y = y;
+    this.containerBG.x = x;
+    this.containerBG.y = y;
+  }
+
+  cambiarZoom(zoom) {
+    this.zoom = zoom;
+    this.containerPrincipal.scale.set(this.zoom);
+    this.containerBG.scale.set(this.zoom);
+  }
+
+  calcularFPS() {
+    this.deltaTime = performance.now() - this.ahora;
+    this.ahora = performance.now();
+    this.fps = 1000 / this.deltaTime;
+    this.ratioDeltaTime = this.deltaTime / 16.66;
+  }
+
+  toggleDebug() {
+    this.debug = !this.debug;
+  }
+
+  finDelJuego() {
+    alert("Te moriste! fin del juego");
+  }
 
   gameLoop(time) {
     //iteramos por todos los conejitos
@@ -249,5 +328,8 @@ class Juego {
       unaPersona.tick();
       unaPersona.render();
     }
+    this.calcularFPS();
+    this.hacerQLaCamaraSigaAAlguien();
+    if (this.ui) this.ui.tick();
   }
 }
