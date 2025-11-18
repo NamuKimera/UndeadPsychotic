@@ -46,6 +46,7 @@ class Policia extends Persona {
     super.tick()
     this.moverseUnaVezLlegadoAlObjetivo()
     this.perseguirAlAsesino()
+    this.noChocarConNingunaPared()
     /*if (this.muerto) return;
     this.verificarSiEstoyMuerto();
 

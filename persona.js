@@ -192,6 +192,56 @@ class Persona extends GameObject {
     this.aceleracion.y += this.factorAlineacion * vectorNuevo.y;
   }
 
+  moverseUnaVezLlegadoAlObjetivo() {
+    /*
+      Con esto, los ciudadanos se mueven al azar por medio de un target, y con chanceDeCambiarAntesDeLlegar se calcula el porcentaje de cambiar de Target 
+    */
+    const chanceDeCambiarAntesDeLlegar = Math.random() < 0.01
+    if (calcularDistancia(this.posicion, this.target.posicion) < 100 || chanceDeCambiarAntesDeLlegar) {
+      this.asignarTarget({ posicion: { x: Math.random() * this.juego.width, y: Math.random() * this.juego.height } });
+      // console.log("El Ciudadano llego al Target")
+    }
+  }
+
+  meEstoyChocandoContraLaParedIzquierda() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 509, 295, 100, 900)
+  }
+
+  meEstoyChocandoContraLaParedDerecha() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1409, 295, 1900, 900)
+  }
+
+  meEstoyChocandoContraLaParedArriba() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 509, 295, 1409, 295)
+  }
+
+  noChocarConLaParedIzquierda() {
+    if (this.meEstoyChocandoContraLaParedIzquierda()) {
+      this.velocidad.x = 100
+      console.log(this.nombre, "choco con pared izquierda")
+    }
+  }
+
+  noChocarConLaParedDerecha() {
+    if (this.meEstoyChocandoContraLaParedDerecha()) {
+      this.velocidad.y = 100
+      console.log(this.nombre, "choco con pared derecha")
+    }
+  }
+
+  noChocarConLaParedArriba() {
+    if (this.meEstoyChocandoContraLaParedArriba()) {
+      this.velocidad.y = 100
+      console.log(this.nombre, "choco con pared arriba")
+    }
+  }
+
+  noChocarConNingunaPared(){
+    this.noChocarConLaParedIzquierda()
+    this.noChocarConLaParedDerecha()
+    this.noChocarConLaParedArriba()
+  }
+
   /*cohesion() {
     let cont = 0;
     //verctor vacio donde vamos a ir sumando posiciones
@@ -253,15 +303,6 @@ class Persona extends GameObject {
       this.aceleracion.y += vectorNuevo.y;
     }
   }*/
-
-  siEstoyPeleandoMirarHaciaMiOponente() {
-    if (!this.enemigoMasCerca) return;
-    if (!this.behaviorFSM) return;
-    if (this.behaviorFSM.currentStateName !== "enCombate") return;
-    if (this.distanciaAlEnemigoMasCerca > this.rangoDeAtaque) return;
-
-    this.angulo = radianesAGrados(Math.atan2(this.enemigoMasCerca.posicion.y - this.posicion.y, this.enemigoMasCerca.posicion.x - this.posicion.x)) + 180;
-  }
 
   verificarSiEstoyMuerto() {
     if (this.vida <= 0) {

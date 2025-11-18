@@ -17,5 +17,6 @@ class Asesino extends Persona {
 
   tick() {
     super.tick()
+    this.noChocarConNingunaPared()
   }
 }
