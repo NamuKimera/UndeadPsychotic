@@ -4,7 +4,7 @@ class Fuente extends EntidadEstatica {
         this.radio = 10;
         this.scaleX = scaleX || 1;
         this.scaleY = scaleY || 1;
-        this.container.label = "Fuente";
+        this.container.label = "Fuente" + this.id;
         this.crearSprite();
     }
 

@@ -17,22 +17,12 @@ class GameObject {
     this.container = new PIXI.Container();
     this.container.name = "container";
     this.vision = Math.random() * 200 + 1300;
-    //guarda una referencia a la instancia del juego
     this.posicion = { x: x, y: y };
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };
     this.aceleracion = { x: 0, y: 0 };
-
     this.juego = juego;
     //generamos un ID para este conejito
     this.id = Math.floor(Math.random() * 99999999);
-
-    // tomo como parametro la textura y creo un sprite
-
-    // this.sprite.play();
-    // this.sprite.loop = true;
-    // this.sprite.animationSpeed = 0.1;
-    // this.sprite.scale.set(2);
-
     this.juego.containerPrincipal.addChild(this.container);
   }
 
@@ -48,13 +38,11 @@ class GameObject {
   cargarSpritesAnimados(textureData, escala) {
     for (let key of Object.keys(textureData.animations)) {
       this.spritesAnimados[key] = new PIXI.AnimatedSprite(textureData.animations[key]);
-
       this.spritesAnimados[key].play();
       this.spritesAnimados[key].loop = true;
       this.spritesAnimados[key].animationSpeed = 0.1;
       this.spritesAnimados[key].scale.set(escala);
-      this.spritesAnimados[key].anchor.set(0.5, 1);
-
+      this.spritesAnimados[key].anchor.set(1, 1);
       this.container.addChild(this.spritesAnimados[key]);
     }
   }
@@ -62,7 +50,6 @@ class GameObject {
   separacion() {
     let promedioDePosicionDeAquellosQEstanMuyCercaMio = { x: 0, y: 0 };
     let contador = 0;
-
     for (let persona of this.juego.personas) {
       if (this != persona) {
         if (calcularDistancia(this.posicion, persona.posicion) < this.distanciaPersonal) {
@@ -72,33 +59,66 @@ class GameObject {
         }
       }
     }
-
     if (contador == 0) return;
-
     promedioDePosicionDeAquellosQEstanMuyCercaMio.x /= contador;
     promedioDePosicionDeAquellosQEstanMuyCercaMio.y /= contador;
-
     let vectorQueSeAlejaDelPromedioDePosicion = {
       x: this.posicion.x - promedioDePosicionDeAquellosQEstanMuyCercaMio.x,
       y: this.posicion.y - promedioDePosicionDeAquellosQEstanMuyCercaMio.y,
     };
-
     vectorQueSeAlejaDelPromedioDePosicion = limitarVector(
       vectorQueSeAlejaDelPromedioDePosicion,
       1
     );
-
     const factor = 10;
-
     this.aceleracion.x += vectorQueSeAlejaDelPromedioDePosicion.x * factor;
     this.aceleracion.y += vectorQueSeAlejaDelPromedioDePosicion.y * factor;
   }
 
+  /*
+  cohesion() {
+    let cont = 0;
+    //verctor vacio donde vamos a ir sumando posiciones
+    let vectorPromedioDePosiciones = { x: 0, y: 0 };
+    //iteramos por todos los amigos
+    for (const persona of this.amigosCerca) {
+      if (persona === this || persona === this.juego.protagonista) continue;
+      //si la persona ota no soy yo y no es el protagonista
+      const distancia = calcularDistancia(this.posicion, persona.posicion);
+      const sumaDeRadios = this.radio + persona.radio;
+      const distanciaMinima = sumaDeRadios * 3;
+      if (distancia < this.vision && distancia > distanciaMinima) {
+        //si la persona esta muy cerca no nos acercamos a ella
+        cont++;
+        vectorPromedioDePosiciones.x += persona.posicion.x;
+        vectorPromedioDePosiciones.y += persona.posicion.y;
+      }
+    }
+    if (cont == 0) return;
+    vectorPromedioDePosiciones.x /= cont;
+    vectorPromedioDePosiciones.y /= cont;
+    let vectorNuevo = limitarVector({
+      x: vectorPromedioDePosiciones.x - this.posicion.x,
+      y: vectorPromedioDePosiciones.y - this.posicion.y,
+    });
+    const distanciaAlPromedioDePosiciones = calcularDistancia(
+      this.posicion,
+      vectorPromedioDePosiciones
+    );
+    const distanciaMinima = this.radio * 14;
+    if (distanciaAlPromedioDePosiciones < distanciaMinima) return;
+    const factorDistancia = distanciaAlPromedioDePosiciones / distanciaMinima;
+    vectorNuevo.x *= factorDistancia;
+    vectorNuevo.y *= factorDistancia;
+    this.aceleracion.x += this.factorCohesion * vectorNuevo.x;
+    this.aceleracion.y += this.factorCohesion * vectorNuevo.y;
+  }
+  */
+ 
   cambiarDeSpriteAnimadoSegunAngulo() {
     //0 grados es a la izq, abre en sentido horario, por lo cual 180 es a la derecha
     //90 es para arriba
     //270 abajo
-
     if ((this.angulo > 315 && this.angulo < 360) || this.angulo < 45) {
       this.cambiarAnimacion("caminarDerecha");
       this.spritesAnimados.caminarDerecha.scale.x = -15;
@@ -135,7 +155,6 @@ class GameObject {
       //y al ser 0.99 pierde 1% de velocidad
       this.velocidad.x *= -0.99;
     }
-
     if (this.posicion.y > this.juego.height || this.posicion.y < 0) {
       this.velocidad.y *= -0.99;
     }
@@ -156,19 +175,15 @@ class GameObject {
     if (!this.target) return;
     const dist = calcularDistancia(this.posicion, this.target.posicion);
     if (dist > this.vision) return;
-
     // Decaimiento exponencial: va de 1 a 0 a medida que se acerca
     let factor = Math.pow(dist / this.distanciaParaLlegar, 3);
-
     const difX = this.target.posicion.x - this.posicion.x;
     const difY = this.target.posicion.y - this.posicion.y;
-
     let vectorTemporal = {
       x: -difX,
       y: -difY,
     };
     vectorTemporal = limitarVector(vectorTemporal, 1);
-
     this.aceleracion.x += -vectorTemporal.x * factor;
     this.aceleracion.y += -vectorTemporal.y * factor;
   }
@@ -177,16 +192,13 @@ class GameObject {
     if (!this.perseguidor) return;
     const dist = calcularDistancia(this.posicion, this.perseguidor.posicion);
     if (dist > this.vision) return;
-
     const difX = this.perseguidor.posicion.x - this.posicion.x;
     const difY = this.perseguidor.posicion.y - this.posicion.y;
-
     let vectorTemporal = {
       x: -difX,
       y: -difY,
     };
     vectorTemporal = limitarVector(vectorTemporal, 1);
-
     this.aceleracion.x += -vectorTemporal.x;
     this.aceleracion.y += -vectorTemporal.y;
   }
@@ -198,23 +210,19 @@ class GameObject {
 
   tick() {
     //TODO: hablar de deltatime
-
     this.separacion();
     this.escapar();
     this.perseguir();
     this.limitarAceleracion();
     this.velocidad.x += this.aceleracion.x * this.juego.pixiApp.ticker.deltaTime;
     this.velocidad.y += this.aceleracion.y * this.juego.pixiApp.ticker.deltaTime;
-
     //variaciones de la velocidad
     this.rebotar();
     this.aplicarFriccion();
     this.limitarVelocidad();
-
     //pixeles por frame
     this.posicion.x += this.velocidad.x * this.juego.pixiApp.ticker.deltaTime;
     this.posicion.y += this.velocidad.y * this.juego.pixiApp.ticker.deltaTime;
-
     //guardamos el angulo
     this.angulo = radianesAGrados(Math.atan2(this.velocidad.y, this.velocidad.x)) + 180;
     this.velocidadLineal = Math.sqrt(this.velocidad.x * this.velocidad.x + this.velocidad.y * this.velocidad.y);
@@ -223,7 +231,6 @@ class GameObject {
   render() {
     this.container.x = this.posicion.x;
     this.container.y = this.posicion.y;
-
     this.container.zIndex = this.posicion.y;
   }
 }

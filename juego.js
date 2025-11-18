@@ -34,7 +34,6 @@ class Juego {
     this.minZoom = 0.1;
     this.maxZoom = 2;
     this.zoomStep = 0.1;
-    // this.grilla = new Grilla(this, 150, this.anchoDelMapa, this.altoDelMapa);
     this.initPIXI();
     this.initMatterJS();
     this.setupResizeHandler();
@@ -143,20 +142,16 @@ class Juego {
       resolution: 1,
       resizeTo: window,
     };
-
     //inicializamos pixi con las opciones definidas anteriormente
     //await indica q el codigo se frena hasta que el metodo init de la app de pixi haya terminado
     //puede tardar 2ms, 400ms.. no lo sabemos :O
     await this.pixiApp.init(opcionesDePixi);
-
     // //agregamos el elementos canvas creado por pixi en el documento html
     document.body.appendChild(this.pixiApp.canvas);
     //agregamos el metodo this.gameLoop al ticker.
     //es decir: en cada frame vamos a ejecutar el metodo this.gameLoop
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
-
     this.agregarListenersDeTeclado();
-
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
     this.crearNivel();
@@ -173,25 +168,19 @@ class Juego {
     this.containerPrincipal.label = "containerPrincipal";
     this.containerPrincipal.zIndex = Z_INDEX.containerPrincipal;
     this.pixiApp.stage.addChild(this.containerPrincipal);
-
     // this.crearContainerBG();
     // this.crearGraficoDebug();
-
     // await this.cargarTexturas();
     this.crearFondo();
-
-    this.crearFondo();
     this.crearLocal();
-    this.crearFuente();
-    this.crearSilla();
-    this.crearPalmera();
+    this.crearFuentes();
+    this.crearSillas();
+    this.crearPalmeras();
     this.crearAsesino();
     this.targetCamara = this.protagonista;
     this.crearCiudadanos(20);
     this.crearPolicias(10);
-
     // this.crearCruzTarget();
-
     // Crear el sistema de iluminación
     // this.sistemaDeIluminacion = new SistemaDeIluminacion(this);
     // this.particleSystem = new ParticleSystem(this);
@@ -213,21 +202,49 @@ class Juego {
     this.objetosInanimados.push(local);
   }
 
-  crearPalmera() {
+  crearPalmeras() {
+    this.crearPalmera1()
+    this.crearPalmera2()
+  }
+
+  crearPalmera1(){
     const x = 900;
     const y = 700;
-    const local = new Palmera(x, y, this, 0.5, 0.5);
-    this.objetosInanimados.push(local);
+    const palmera = new Palmera(x, y, this, 0.5, 0.5);
+    this.objetosInanimados.push(palmera);
   }
 
-  crearFuente() {
+  crearPalmera2(){
+    const x = 1000;
+    const y = 1400;
+    const palmera = new Palmera(x, y, this, 0.5, 0.5);
+    this.objetosInanimados.push(palmera);
+  }
+
+  crearFuentes() {
+    this.crearFuente1();
+    this.crearFuente2();
+  }
+
+  crearFuente1(){
+    const x = 3070;
+    const y = 1420;
+    const fuente1 = new Fuente(x, y, this, 0.5, 0.5);
+    this.objetosInanimados.push(fuente1);
+  }
+
+  crearFuente2(){
     const x = 1400;
     const y = 800;
-    const fuente = new Fuente(x, y, this, 0.5, 0.5);
-    this.objetosInanimados.push(fuente);
+    const fuente2 = new Fuente(x, y, this, 0.5, 0.5);
+    this.objetosInanimados.push(fuente2);
   }
 
-  crearSilla() {
+  crearSillas() {
+    this.crearSilla1()
+  }
+
+  crearSilla1(){
     const x = 650;
     const y = 600;
     const silla = new Silla(x, y, this, 0.5, 0.5);
@@ -245,8 +262,8 @@ class Juego {
 
   async crearCiudadanos(cant) {
     for (let i = 0; i < cant; i++) {
-      const x = 0.5 * this.width;
-      const y = 0.5 * this.height;
+      const x = 2400;
+      const y = 1600;
       const animacionesCiudadano = await PIXI.Assets.load("assets/personajes/img/ciudadano.json");
       const civiles = new Ciudadano(animacionesCiudadano, x, y, this);
       this.personas.push(civiles);
@@ -256,8 +273,8 @@ class Juego {
 
   async crearPolicias(cant) {
     for (let i = 0; i < cant; i++) {
-      const x = 0.5 * this.width;
-      const y = 0.5 * this.height;
+      const x = 2550;
+      const y = 1500;
       const animacionesPolicia = await PIXI.Assets.load("assets/personajes/img/policia.json");
       const policia = new Policia(animacionesPolicia, x, y, this);
       this.personas.push(policia);
@@ -341,12 +358,15 @@ class Juego {
     // Ajustar la posición considerando el zoom actual
     let targetX = -this.targetCamara.posicion.x * this.zoom + this.width / 2;
     let targetY = -this.targetCamara.posicion.y * this.zoom + this.height / 2;
-
     const x = (targetX - this.containerPrincipal.x) * 0.1;
     const y = (targetY - this.containerPrincipal.y) * 0.1;
-
     this.containerPrincipal.x += x;
     this.containerPrincipal.y += y;
+    this.moverContainerPrincipalA(
+      this.containerPrincipal.x + x,
+      this.containerPrincipal.y + y
+    );
+    console.log("La camara funciona")
   }
 
   moverContainerPrincipalA(x, y) {
@@ -377,60 +397,21 @@ class Juego {
     alert("Te moriste! fin del juego");
   }
 
-  chequearQueNoHayaMuertosConBarraDeVida() {
-    this.containerPrincipal.children
-      .filter((child) => child.label.startsWith("persona muerta"))
-      .forEach((k) => {
-        const containerBarraVida = k.children.find((k) =>
-          k.label.startsWith("containerBarraVida")
-        );
-
-        const spriteAnimado = k.children.find((k) =>
-          k.label.startsWith("animatedSprite")
-        );
-
-        //fade out muertos
-        if (spriteAnimado) {
-          spriteAnimado.alpha *= 0.996;
-          spriteAnimado.alpha -= 0.0001;
-
-          if (spriteAnimado.alpha < 0.01) {
-            k.removeChild(spriteAnimado);
-            spriteAnimado.destroy();
-            this.containerPrincipal.removeChild(k);
-          }
-        }
-
-        if (containerBarraVida) {
-          k.removeChild(containerBarraVida);
-          containerBarraVida.destroy();
-        }
-      });
-  }
-
   gameLoop(time) {
     console.log("gameLoop", time, this.ahora);
     //borrar lo q hay en los graficos debug
     if (this.graficoDebug) this.graficoDebug.clear();
-
     for (let unpersona of this.personas) unpersona.tick();
     for (let unpersona of this.personas) unpersona.render();
-
     /*for (let arbol of this.arboles) arbol.tick();
     for (let farol of this.faroles) farol.tick();
-
     for (let obstaculo of this.obstaculos) obstaculo.render();
-
     // Actualizar el sistema de iluminación
     if (this.sistemaDeIluminacion) this.sistemaDeIluminacion.tick();
     if (this.particleSystem) this.particleSystem.update();*/
     if (this.ui) this.ui.tick();
-
-
     this.hacerQLaCamaraSigaAlProtagonista();
     this.calcularFPS();
-    this.chequearQueNoHayaMuertosConBarraDeVida();
-
     if (!this.debug) return;
     // Dibujar las celdas de la grilla
     // Object.values(this.grilla.celdas).forEach((celda) => celda.dibujar());

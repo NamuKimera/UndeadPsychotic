@@ -22,7 +22,7 @@ class Policia extends Persona {
     const chanceDeCambiarAntesDeLlegar = Math.random() < 0.01
     if(calcularDistancia(this.posicion, this.target.posicion) < 100 || chanceDeCambiarAntesDeLlegar){
       this.asignarTarget({posicion: {x: Math.random() * this.juego.width, y: Math.random() * this.juego.height}});
-      console.log("El Policia llego al Target")
+      // console.log("El Policia llego al Target")
     }
   }
 
@@ -54,13 +54,10 @@ class Policia extends Persona {
     this.cohesion();
     this.alineacion();
     this.separacion();
-
     this.perseguir();
-
     this.noChocarConObstaculos();
     this.repelerSuavementeObstaculos();
     // this.pegarSiEstaEnMiRango();
-
     this.calcularAnguloYVelocidadLineal();*/
   }
 }
