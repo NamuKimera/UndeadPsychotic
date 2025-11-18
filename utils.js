@@ -24,12 +24,12 @@ function limitarVector(vector, magnitudMaxima = 1) {
 }
 
 // Cache para texturas negras para evitar recrearlas
-const texturaNegrCache = new Map();
+const texturaNegraCache = new Map();
 
 function crearSpriteNegro(anchoDelMapa, altoDelMapa) {
   // Verificar si ya tenemos esta textura en cache
   const cacheKey = `negro_${anchoDelMapa}x${altoDelMapa}`;
-  let textura = texturaNegrCache.get(cacheKey);
+  let textura = texturaNegraCache.get(cacheKey);
 
   if (!textura) {
     // Crear un canvas negro del tamaño del mapa solo si no existe en cache
