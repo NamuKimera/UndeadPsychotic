@@ -67,22 +67,22 @@ class Asesino extends Persona {
       direction = 'up';
       this.cambiarAnimacion("caminarArriba");
       console.log('Asesino moviéndose hacia arriba');
-      console.log("El movimiento arriba se actualizo");
+      console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowDown'] || this.keysPressed['s']) {
       direction = 'down';
       this.cambiarAnimacion("caminarAbajo");
       console.log('Asesino moviéndose hacia abajo')
-      console.log("El movimiento abajo se actualizo")
+      console.log("El movimiento se actualizo")
     } else if (this.keysPressed['ArrowLeft'] || this.keysPressed['a']) {
       direction = 'left';
       this.cambiarAnimacion("caminarDerecha");
       console.log('Asesino moviéndose hacia la izquierda')
-      console.log("El movimiento izquierda se actualizo")
+      console.log("El movimiento se actualizo")
     } else if (this.keysPressed['ArrowRight'] || this.keysPressed['d']) {
       direction = 'right';
       this.cambiarAnimacion("caminarDerecha");
       console.log('Asesino moviéndose hacia la derecha')
-      console.log("El movimiento derecha se actualizo")
+      console.log("El movimiento se actualizo")
     }
     if (direction) {
       this.move(direction);
@@ -106,34 +106,6 @@ class Asesino extends Persona {
   stop() {
     Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
   }
-
-  setAssassinDirection(direction) {
-    // Actualizar la dirección interna del asesino
-    assassinFSM.dispatch(`move${direction.charAt(0).toUpperCase() + direction.slice(1)}`); // Ej: moveUp, moveDown, etc.
-    // Aplicar velocidad correspondiente en Matter.js
-    const speed = 5; // Ajusta la velocidad según sea necesario
-    switch (direction) {
-      case 'up':
-        assassinBody.velocity.y = -speed; // Mover hacia arriba
-        break;
-      case 'down':
-        assassinBody.velocity.y = speed; // Mover hacia abajo
-        break;
-      case 'left':
-        assassinBody.velocity.x = -speed; // Mover hacia la izquierda
-        break;
-      case 'right':
-        assassinBody.velocity.x = speed; // Mover hacia la derecha
-        break;
-      default:
-        console.warn('Dirección inválida:', direction);
-    }
-    // Cambiar animación del sprite
-    if (assassinSprite) {
-      assassinSprite.gotoAndPlay(`walk${direction.charAt(0).toUpperCase() + direction.slice(1)}`); // Cambia la animación del sprite
-    }
-  }
-
   shoot(direction) {
     // Crear proyectil en Matter.js y PixiJS
     const projectile = Matter.Bodies.circle(assassinBody.position.x, assassinBody.position.y, 5, {
@@ -171,7 +143,6 @@ class Asesino extends Persona {
     super.tick()
     this.noChocarConNingunaPared()
     this.updateMovement(); // Actualiza el movimiento y la FSM
-    // ... (resto del código de renderizado y actualización del motor)
     //Matter.Engine.update(engine);
   }
 }

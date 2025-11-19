@@ -31,19 +31,19 @@ class Persona extends GameObject {
   // Método para mover la persona
   move(direction) {
     if (!this.body) return;
-    const velocity = this.velocidad;
+    const velocidad = 5;
     switch (direction) {
       case 'up':
-        Matter.Body.setVelocity(this.body, { x: 0, y: -velocity });
+        Matter.Body.setVelocity(this.body, { x: 0, y: -velocidad });
         break;
       case 'down':
-        Matter.Body.setVelocity(this.body, { x: 0, y: velocity });
+        Matter.Body.setVelocity(this.body, { x: 0, y: velocidad });
         break;
       case 'left':
-        Matter.Body.setVelocity(this.body, { x: -velocity, y: 0 });
+        Matter.Body.setVelocity(this.body, { x: -velocidad, y: 0 });
         break;
       case 'right':
-        Matter.Body.setVelocity(this.body, { x: velocity, y: 0 });
+        Matter.Body.setVelocity(this.body, { x: velocidad, y: 0 });
         break;
       default:
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
@@ -53,19 +53,19 @@ class Persona extends GameObject {
   // Método para retroceder (se llamará en el evento de colisión)
   retroceder(direction) {
     if (!this.body) return;
-    const backwardVelocity = 5; // Ajusta la velocidad de retroceso
+    const velocidadRetroceso = 5; // Ajusta la velocidad de retroceso
     switch (direction) {
       case 'left':
-        Matter.Body.setVelocity(this.body, { x: backwardVelocity, y: 0 }); // Retroceder a la derecha
+        Matter.Body.setVelocity(this.body, { x: velocidadRetroceso, y: 0 }); // Retroceder a la derecha
         break;
       case 'right':
-        Matter.Body.setVelocity(this.body, { x: -backwardVelocity, y: 0 }); // Retroceder a la izquierda
+        Matter.Body.setVelocity(this.body, { x: -velocidadRetroceso, y: 0 }); // Retroceder a la izquierda
         break;
       case 'up':
-        Matter.Body.setVelocity(this.body, { x: 0, y: backwardVelocity }); // Retroceder hacia abajo
+        Matter.Body.setVelocity(this.body, { x: 0, y: velocidadRetroceso }); // Retroceder hacia abajo
         break;
       case 'down':
-        Matter.Body.setVelocity(this.body, { x: 0, y: -backwardVelocity }); // Retroceder hacia arriba
+        Matter.Body.setVelocity(this.body, { x: 0, y: -velocidadRetroceso }); // Retroceder hacia arriba
         break;
       default:
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
@@ -198,33 +198,22 @@ class Persona extends GameObject {
     if (this.vida > this.vidaMaxima) this.vida = this.vidaMaxima;
   }
 
-  quitarSombra() {
-    if (this.sombra) {
-      this.container.removeChild(this.sombra);
-      this.sombra.destroy();
-      this.sombra = null;
-    }
-  }
-
   quitarmeDeLosArrays() {
-    // console.log("quitarmeDeLosArrays", this.id);
-    this.juego.asesino = this.juego.personas.filter((persona) => persona !== this);
+    this.juego.personas = this.juego.personas.filter((persona) => persona !== this);
     this.juego.policias = this.juego.policias.filter((persona) => persona !== this);
-    this.juego.civiles = this.juego.civiles.filter((persona) => persona !== this);
+    this.juego.ciudadanos = this.juego.ciudadanos.filter((persona) => persona !== this);
+    // console.log("quitarmeDeLosArrays", this.id);
   }
 
   morir() {
     if (this.muerto) return;
-    if (this.animationFSM) this.animationFSM.destroy();
     this.container.label = "persona muerta - " + this.id;
     this.quitarSombra();
     this.quitarBarritaVida();
-    this.sprite.changeAnimation("hurt");
     this.sprite.loop = false;
     // Marcar como muerto PRIMERO para evitar que se actualice la barra durante el proceso
     this.muerto = true;
     // Limpiar la barra de vida DESPUÉS de marcar como muerto
-    this.borrarmeComoTargetDeTodos();
     this.quitarmeDeLosArrays();
   }
 
@@ -235,7 +224,6 @@ class Persona extends GameObject {
 
   borrar() {
     this.juego.containerPrincipal.removeChild(this.container);
-    this.borrarmeComoTargetDeTodos();
     this.quitarmeDeLosArrays();
     this.container.parent = null;
     this.container = null;

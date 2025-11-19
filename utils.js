@@ -466,13 +466,10 @@ function intersectaLineaCirculo(cx, cy, r, x1, y1, x2, y2) {
 }
 
 function calcularAngulo(p1, p2) {
-  // Diferencia de coordenadas (vector de dirección)
   const dx = p2.x - p1.x;
   const dy = p2.y - p1.y;
-  // Calcula el ángulo en radianes usando atan2
-  const rad = Math.atan2(dy, dx);
-  // Convierte a grados (si es necesario)
-  const deg = rad * (180 / Math.PI);
+  const rad = Math.atan2(dy, dx); // Calcula el ángulo en radianes
+  const deg = rad * (180 / Math.PI); // Convierte radianes a grados
   return deg;
 }
 
@@ -480,7 +477,9 @@ function createFSM(initialState, transitions) {
   let currentState = initialState;
   function dispatch(event) {
     const transition = transitions[currentState] && transitions[currentState][event];
-
+    if (!transition) {
+      throw new Error(`Transición no definida desde el estado "${currentState}" para el evento "${event}"`);
+    }
     if (transition) {
       currentState = transition.target;
       if (transition.action) {
@@ -492,11 +491,9 @@ function createFSM(initialState, transitions) {
       return false; // No hubo transición
     }
   }
-
   function getCurrentState() {
     return currentState;
   }
-
   return {
     dispatch,
     getCurrentState,
