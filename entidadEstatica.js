@@ -4,11 +4,21 @@ class EntidadEstatica extends GameObject {
     this.radio = 20;
     this.sprite = null;
     this.render();
+    this.body = null; // Cuerpo de Matter.js (inicialmente nulo)
+    this.options = {};
+    this.createBody();
   }
-  
+
   calcularRadio() {
     this.radio = (this.sprite.width + Math.sqrt(this.sprite.height)) * 0.25;
   }
 
-  tick() {}
+  createBody() {
+    this.body = Matter.Bodies.rectangle(this.x, this.y, this.width, this.height, {
+      isStatic: true, // Las entidades estáticas son estáticas
+      ...this.options
+    });
+  }
+
+  tick() { }
 }

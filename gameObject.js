@@ -8,7 +8,6 @@ class GameObject {
   perseguidor;
   aceleracionMaxima = 0.2;
   velocidadMaxima = 3;
-  spritesAnimados = {};
   radio = 10;
   distanciaPersonal = 20;
   distanciaParaLlegar = 300;
@@ -21,50 +20,21 @@ class GameObject {
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };
     this.aceleracion = { x: 0, y: 0 };
     this.juego = juego;
-    //generamos un ID para este conejito
+    this.body = null; // Cuerpo de Matter.js (inicialmente nulo)
+    this.options = {};
     this.id = Math.floor(Math.random() * 99999999);
     this.juego.containerPrincipal.addChild(this.container);
   }
 
-  cambiarAnimacion(cual) {
-    //hacemos todos invisibles
-    for (let key of Object.keys(this.spritesAnimados)) {
-      this.spritesAnimados[key].visible = false;
-    }
-    //y despues hacemos visible el q queremos
-    this.spritesAnimados[cual].visible = true;
+  // Método para crear el cuerpo de Matter.js (puede ser sobreescrito por las subclases)
+  createBody() {
+    // Implementación básica (puede ser sobreescrita)
+    this.body = Matter.Bodies.rectangle(this.x, this.y, this.height, this.width, this.options); // Ejemplo
   }
-  cargarSpritesAnimados(textureData, escala) {
-    for (let key of Object.keys(textureData.animations)) {
-      this.spritesAnimados[key] = new PIXI.AnimatedSprite(textureData.animations[key]);
-      this.spritesAnimados[key].play();
-      this.spritesAnimados[key].loop = true;
-      this.spritesAnimados[key].animationSpeed = 0.1;
-      this.spritesAnimados[key].scale.set(escala);
-      this.spritesAnimados[key].anchor.set(1, 1);
-      this.container.addChild(this.spritesAnimados[key]);
-    }
-  }
-  cambiarDeSpriteAnimadoSegunAngulo() {
-    //0 grados es a la izq, abre en sentido horario, por lo cual 180 es a la derecha
-    //90 es para arriba
-    //270 abajo
-    if ((this.angulo > 315 && this.angulo < 360) || this.angulo < 45) {
-      this.cambiarAnimacion("caminarDerecha");
-      this.spritesAnimados.caminarDerecha.scale.x = -15;
-    } else if (this.angulo > 135 && this.angulo < 225) {
-      this.cambiarAnimacion("caminarDerecha");
-      this.spritesAnimados.caminarDerecha.scale.x = 15;
-    } else if (this.angulo < 135 && this.angulo > 45) {
-      this.cambiarAnimacion("caminarArriba");
-    } else {
-      this.cambiarAnimacion("caminarAbajo");
-    }
-  }
-  cambiarVelocidadDeAnimacionSegunVelocidadLineal() {
-    const keys = Object.keys(this.spritesAnimados);
-    for (let key of keys) {
-      this.spritesAnimados[key].animationSpeed = this.velocidadLineal * 0.05 * this.juego.pixiApp.ticker.deltaTime;
+  // Método para agregar el cuerpo al mundo
+  addToWorld(world) {
+    if (this.body) {
+      Matter.World.add(world, this.body);
     }
   }
 
@@ -95,9 +65,7 @@ class GameObject {
     this.aceleracion.x += vectorQueSeAlejaDelPromedioDePosicion.x * factor;
     this.aceleracion.y += vectorQueSeAlejaDelPromedioDePosicion.y * factor;
   }
-
-  /*
-  cohesion() {
+  /*cohesion() {
     let cont = 0;
     //verctor vacio donde vamos a ir sumando posiciones
     let vectorPromedioDePosiciones = { x: 0, y: 0 };
@@ -133,8 +101,7 @@ class GameObject {
     vectorNuevo.y *= factorDistancia;
     this.aceleracion.x += this.factorCohesion * vectorNuevo.x;
     this.aceleracion.y += this.factorCohesion * vectorNuevo.y;
-  }
-  */
+  }*/
   rebotar() {
     //ejemplo mas realista
     if (this.posicion.x > this.juego.width || this.posicion.x < 0) {
@@ -164,7 +131,6 @@ class GameObject {
     this.aceleracion.x += -vectorTemporal.x * factor;
     this.aceleracion.y += -vectorTemporal.y * factor;
   }
-
   escapar() {
     if (!this.perseguidor) return;
     const dist = calcularDistancia(this.posicion, this.perseguidor.posicion);
@@ -179,7 +145,6 @@ class GameObject {
     this.aceleracion.x += -vectorTemporal.x;
     this.aceleracion.y += -vectorTemporal.y;
   }
-
   alineacion() {
     let cont = 0;
     let vectorPromedioDeVelocidades = { x: 0, y: 0 };
@@ -243,7 +208,6 @@ class GameObject {
     this.angulo = radianesAGrados(Math.atan2(this.velocidad.y, this.velocidad.x)) + 180;
     this.velocidadLineal = Math.sqrt(this.velocidad.x * this.velocidad.x + this.velocidad.y * this.velocidad.y);
   }
-
   render() {
     this.container.x = this.posicion.x;
     this.container.y = this.posicion.y;

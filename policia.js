@@ -1,17 +1,15 @@
 class Policia extends Persona {
   constructor(textureData, x, y, juego) {
     super(x, y, juego);
-    // console.log("La Ley fue insertada correctamente", textureData, x, y, juego)
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")
     this.factorPerseguir = 0.9;
     this.factorEscapar = 1 - this.coraje;
     this.distanciaParaLlegarALTarget = 500;
     this.factorRepelerSuavementeObstaculos = 0.66;
-    this.aceleracionMaxima = 0.25;
-    this.velocidadMaxima = 1;
     this.factorAlineacion = 0.33;
-    this.asignarTarget(this.juego.mouse);
+    this.asignarTarget({ posicion: { x: Math.random() * this.juego.width, y: Math.random() * this.juego.height } }); // Al usar el ancho y alto del juego los ciudadanos se mueven al azar
+    // console.log("La Ley fue insertada correctamente", textureData, x, y, juego)
   }
 
   estaElAsesinoEnMiAreaDeVision(){
@@ -36,9 +34,6 @@ class Policia extends Persona {
     this.noChocarConNingunaPared()
     /*if (this.muerto) return;
     this.verificarSiEstoyMuerto();
-    this.cohesion();
-    this.alineacion();
-    this.noChocarConObstaculos();
     this.repelerSuavementeObstaculos();
     this.calcularAnguloYVelocidadLineal();*/
   }

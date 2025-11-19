@@ -475,3 +475,43 @@ function calcularAngulo(p1, p2) {
   const deg = rad * (180 / Math.PI);
   return deg;
 }
+
+function createFSM(initialState, states) {
+  let currentState = initialState;
+  return {
+    getCurrentState() {
+      return currentState;
+    },
+    transition(event) {
+      const stateDefinition = states[currentState];
+      if (!stateDefinition) {
+        console.error(`State '${currentState}' is not defined.`);
+        return;
+      }
+      const nextState = stateDefinition.transitions[event];
+      if (nextState) {
+        console.log(`Transitioning from '${currentState}' to '${nextState}' via event '${event}'`);
+        currentState = nextState;
+        if (states[currentState] && typeof states[currentState].onEnter === 'function') {
+          states[currentState].onEnter(); // Execute onEnter callback for the new state
+        }
+      } else {
+        console.warn(`Invalid transition: Event '${event}' not allowed from state '${currentState}'.`);
+      }
+    },
+    send(event, payload) {
+      const stateDefinition = states[currentState];
+      if (!stateDefinition) {
+        console.error(`State '${currentState}' is not defined.`);
+        return;
+      }
+      const action = stateDefinition.actions && stateDefinition.actions[event];
+      if (typeof action === 'function') {
+        console.log(`Executing action for event '${event}' in state '${currentState}'.`);
+        action(payload); // Execute action with payload
+      } else {
+        console.warn(`No action defined for event '${event}' in state '${currentState}'.`);
+      }
+    }
+  };
+}

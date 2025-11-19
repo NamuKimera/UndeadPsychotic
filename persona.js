@@ -1,5 +1,6 @@
 class Persona extends GameObject {
   spritesAnimados = {}
+  keysPressed = {};
   constructor(x, y, juego) {
     super(x, y, juego);
     this.container.label = "persona - " + this.id;
@@ -13,16 +14,104 @@ class Persona extends GameObject {
     this.fuerzaDeAtaque = 0.05 + Math.random() * 0.05;
     this.radio = 7 + Math.random() * 3;
     this.rangoDeAtaque = this.radio * 3;
-    this.factorPerseguir = 0.15;
-    this.factorEscapar = 0.1;
-    this.factorSeparacion = 0.5;
-    this.factorCohesion = 0.2;
-    this.factorAlineacion = 0.4;
-    this.factorRepelerSuavementeObstaculos = 10;
-    this.aceleracion.x = 0;
-    this.aceleracion.y = 0;
-    this.aceleracionMaxima = 0.2;
-    this.velocidadMaxima = 3;
+    this.body = null; // Cuerpo de Matter.js (inicialmente nulo)
+    this.options = {};
+    this.createBody();
+  }
+
+  createBody() {
+    this.body = Matter.Bodies.rectangle(this.x, this.y, 9, 25, {
+      isStatic: false, // Las personas no son estáticas
+      restitution: 0.5, // Rebote
+      friction: 0.5, // Fricción
+      ...this.options
+    });
+  }
+
+  // Método para mover la persona
+  move(direction) {
+    if (!this.body) return;
+    const velocity = this.velocidad;
+    switch (direction) {
+      case 'up':
+        Matter.Body.setVelocity(this.body, { x: 0, y: -velocity });
+        break;
+      case 'down':
+        Matter.Body.setVelocity(this.body, { x: 0, y: velocity });
+        break;
+      case 'left':
+        Matter.Body.setVelocity(this.body, { x: -velocity, y: 0 });
+        break;
+      case 'right':
+        Matter.Body.setVelocity(this.body, { x: velocity, y: 0 });
+        break;
+      default:
+        Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
+    }
+  }
+
+  // Método para retroceder (se llamará en el evento de colisión)
+  retroceder(direction) {
+    if (!this.body) return;
+    const backwardVelocity = 5; // Ajusta la velocidad de retroceso
+    switch (direction) {
+      case 'left':
+        Matter.Body.setVelocity(this.body, { x: backwardVelocity, y: 0 }); // Retroceder a la derecha
+        break;
+      case 'right':
+        Matter.Body.setVelocity(this.body, { x: -backwardVelocity, y: 0 }); // Retroceder a la izquierda
+        break;
+      case 'up':
+        Matter.Body.setVelocity(this.body, { x: 0, y: backwardVelocity }); // Retroceder hacia abajo
+        break;
+      case 'down':
+        Matter.Body.setVelocity(this.body, { x: 0, y: -backwardVelocity }); // Retroceder hacia arriba
+        break;
+      default:
+        Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
+    }
+  }
+
+  cambiarAnimacion(cual) {
+    //hacemos todos invisibles
+    for (let key of Object.keys(this.spritesAnimados)) {
+      this.spritesAnimados[key].visible = false;
+    }
+    //y despues hacemos visible el q queremos
+    this.spritesAnimados[cual].visible = true;
+  }
+  cargarSpritesAnimados(textureData, escala) {
+    for (let key of Object.keys(textureData.animations)) {
+      this.spritesAnimados[key] = new PIXI.AnimatedSprite(textureData.animations[key]);
+      this.spritesAnimados[key].play();
+      this.spritesAnimados[key].loop = true;
+      this.spritesAnimados[key].animationSpeed = 0.1;
+      this.spritesAnimados[key].scale.set(escala);
+      this.spritesAnimados[key].anchor.set(1, 1);
+      this.container.addChild(this.spritesAnimados[key]);
+    }
+  }
+  cambiarDeSpriteAnimadoSegunAngulo() {
+    //0 grados es a la izq, abre en sentido horario, por lo cual 180 es a la derecha
+    //90 es para arriba
+    //270 abajo
+    if ((this.angulo > 315 && this.angulo < 360) || this.angulo < 45) {
+      this.cambiarAnimacion("caminarDerecha");
+      this.spritesAnimados.caminarDerecha.scale.x = -15;
+    } else if (this.angulo > 135 && this.angulo < 225) {
+      this.cambiarAnimacion("caminarDerecha");
+      this.spritesAnimados.caminarDerecha.scale.x = 15;
+    } else if (this.angulo < 135 && this.angulo > 45) {
+      this.cambiarAnimacion("caminarArriba");
+    } else {
+      this.cambiarAnimacion("caminarAbajo");
+    }
+  }
+  cambiarVelocidadDeAnimacionSegunVelocidadLineal() {
+    const keys = Object.keys(this.spritesAnimados);
+    for (let key of keys) {
+      this.spritesAnimados[key].animationSpeed = this.velocidadLineal * 0.05 * this.juego.pixiApp.ticker.deltaTime;
+    }
   }
 
   moverseUnaVezLlegadoAlObjetivo() {
@@ -81,24 +170,10 @@ class Persona extends GameObject {
     this.noChocarConLaParedDerecha()
     this.noChocarConLaParedArriba()
   }
-
   retrocederSiChocoConAlgunaPared() {
     if (this.meEstoyChocandoConAlgunaPared()) {
 
     }
-  }
-
-  crearFSMparaAnimacion() {
-    this.animationFSM = new FSM(this, {
-      states: {
-        idle: IdleAnimationState,
-        walk: WalkAnimationState,
-        run: RunAnimationState,
-        pegar: PegarAnimationState,
-        convertirse: ConvertirseAnimationState,
-      },
-      initialState: "idle",
-    });
   }
 
   getPersonasCerca() {
@@ -109,88 +184,7 @@ class Persona extends GameObject {
     this.personasCerca = this.getPersonasCerca();
   }
 
-  buscarObstaculosBienCerquitaMio() {
-    this.obstaculosCercaMio = [];
-    this.obstaculosConLosQueMeEstoyChocando = [];
-    const obstaculosCercasegunLaGrilla = this.celdaActual.obtenerEntidadesAcaYEnCEldasVecinas(1).filter((k) => this.juego.obstaculos.includes(k));
-    for (let obstaculo of obstaculosCercasegunLaGrilla) {
-      const dist = calcularDistancia(
-        this.posicion,
-        obstaculo.getPosicionCentral()
-      );
-      const distDeColision = this.radio + obstaculo.radio;
-      const distConChangui = distDeColision + this.radio * 10;
-      if (dist < distConChangui && dist > distDeColision) {
-        this.obstaculosCercaMio.push(obstaculo);
-      } else if (dist < distDeColision) {
-        this.obstaculosConLosQueMeEstoyChocando.push(obstaculo);
-      }
-    }
-  }
-
-  repelerSuavementeObstaculos() {
-    if (this.obstaculosCercaMio.length == 0) return;
-    const posicionFutura = {
-      x: this.posicion.x + this.velocidad.x * 10,
-      y: this.posicion.y + this.velocidad.y * 10,
-    };
-    let fuerzaRepulsionTotal = { x: 0, y: 0 };
-    for (let obstaculo of this.obstaculosCercaMio) {
-      const posicionObstaculo = obstaculo.getPosicionCentral();
-      // Vector que apunta del obstáculo hacia mi posición futura
-      const vectorRepulsion = limitarVector({
-        x: posicionFutura.x - posicionObstaculo.x,
-        y: posicionFutura.y - posicionObstaculo.y,
-      });
-      const distancia = Math.sqrt(
-        vectorRepulsion.x * vectorRepulsion.x +
-        vectorRepulsion.y * vectorRepulsion.y
-      );
-      // Calcular fuerza inversamente proporcional a la distancia
-      // Cuanto más cerca, más fuerza (usando 1/distancia)
-      const fuerzaBase = 3; // Factor base de repulsión
-      const distanciaMinima = 10; // Distancia mínima para evitar fuerzas extremas
-      const fuerzaRepulsion = fuerzaBase / Math.max(distancia, distanciaMinima);
-      // Aplicar la fuerza de repulsión
-      fuerzaRepulsionTotal.x += vectorRepulsion.x * fuerzaRepulsion;
-      fuerzaRepulsionTotal.y += vectorRepulsion.y * fuerzaRepulsion;
-    }
-    // Aplicar la fuerza total a la aceleración
-    this.aceleracion.x += fuerzaRepulsionTotal.x * this.factorRepelerSuavementeObstaculos;
-    this.aceleracion.y += fuerzaRepulsionTotal.y * this.factorRepelerSuavementeObstaculos;
-  }
-
-  noChocarConObstaculos() {
-    if (this.obstaculosConLosQueMeEstoyChocando.length == 0) return;
-    const posicionFutura = {
-      x: this.posicion.x + this.velocidad.x,
-      y: this.posicion.y + this.velocidad.y,
-    };
-    for (let obstaculo of this.obstaculosConLosQueMeEstoyChocando) {
-      const posicionObstaculo = obstaculo.getPosicionCentral();
-      const vectorRepulsion = {
-        x: posicionFutura.x - posicionObstaculo.x,
-        y: posicionFutura.y - posicionObstaculo.y,
-      };
-      this.aceleracion.x += vectorRepulsion.x;
-      this.aceleracion.y += vectorRepulsion.y;
-    }
-  }
-
   calcularAnguloYVelocidadLineal() {
-    /**
-     * CÁLCULO DE PARÁMETROS DE ANIMACIÓN
-     *
-     * Ángulo de movimiento:
-     * - atan2(y,x) devuelve el ángulo en radianes del vector velocidad
-     * - Se suma 180° para ajustar la orientación del sprite
-     * - Conversión a grados para facilitar el trabajo con animaciones
-     *
-     * Velocidad lineal (magnitud del vector):
-     * - |v| = √(vx² + vy²)
-     * - Se calcula como distancia desde el origen (0,0)
-     * - Usado para determinar qué animación reproducir (idle/walk/run)
-     */
     this.angulo = radianesAGrados(Math.atan2(this.velocidad.y, this.velocidad.x)) + 180;
     this.velocidadLineal = calcularDistancia(this.velocidad, { x: 0, y: 0 });
   }
@@ -214,9 +208,7 @@ class Persona extends GameObject {
 
   quitarmeDeLosArrays() {
     // console.log("quitarmeDeLosArrays", this.id);
-    this.juego.personas = this.juego.personas.filter((persona) => persona !== this);
-    this.juego.enemigos = this.juego.enemigos.filter((persona) => persona !== this);
-    this.juego.amigos = this.juego.amigos.filter((persona) => persona !== this);
+    this.juego.asesino = this.juego.personas.filter((persona) => persona !== this);
     this.juego.policias = this.juego.policias.filter((persona) => persona !== this);
     this.juego.civiles = this.juego.civiles.filter((persona) => persona !== this);
   }
@@ -255,12 +247,6 @@ class Persona extends GameObject {
   }
 
   render() {
-    /*
-     * RENDERIZADO CON ORDENAMIENTO EN PROFUNDIDAD
-     * 1. Verificaciones de seguridad
-     * 2. Sincronización física-visual (super.render())
-     * 3. Actualización del sistema de animación
-     */
     super.render();
     this.cambiarDeSpriteAnimadoSegunAngulo()
   }
