@@ -37,20 +37,6 @@ class Juego {
     this.setupResizeHandler();
   }
 
-  setupResizeHandler() {
-    window.addEventListener("resize", () => {
-      this.updateDimensions();
-      if (this.pixiApp) {
-        this.pixiApp.renderer.resize(this.width, this.height);
-      }
-      // Redimensionar la RenderTexture del sistema de iluminación
-      if (this.sistemaDeIluminacion) {
-        this.sistemaDeIluminacion.redimensionarRenderTexture();
-      }
-      if (this.ui) this.ui.resize();
-    });
-  }
-
   initMatterJS() {
     // module aliases
     var Engine = Matter.Engine,
@@ -142,6 +128,20 @@ class Juego {
     this.crearNivel();
     this.ui = new UI(this);
   }
+  
+  setupResizeHandler() {
+    window.addEventListener("resize", () => {
+      this.updateDimensions();
+      if (this.pixiApp) {
+        this.pixiApp.renderer.resize(this.width, this.height);
+      }
+      // Redimensionar la RenderTexture del sistema de iluminación
+      if (this.sistemaDeIluminacion) {
+        this.sistemaDeIluminacion.redimensionarRenderTexture();
+      }
+      if (this.ui) this.ui.resize();
+    });
+  }
 
   updateDimensions() {
     this.width = window.innerWidth;
@@ -154,7 +154,7 @@ class Juego {
     this.containerPrincipal.zIndex = Z_INDEX.containerPrincipal;
     this.pixiApp.stage.addChild(this.containerPrincipal);
     this.crearFondo();
-    this.crearParedes(0, 0, this.anchoDelMapa, this.altoDelMapa);
+    this.crearParedes(0, 0, 3800, 2120);
     this.crearLocales();
     this.crearFuentes();
     this.crearSillas();
