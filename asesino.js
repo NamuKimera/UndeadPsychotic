@@ -1,7 +1,6 @@
 class Asesino extends Persona {
   constructor(textureData, x, y, juego) {
     super(x, y, juego);
-    this.keysPressed = [];
     // Configuración especial del protagonista
     this.vida = 10;
     this.vision = 100; // Visión ilimitada
@@ -10,9 +9,9 @@ class Asesino extends Persona {
     this.container.label = "prota";
     this.factorIrAlTarget = 0.5;
     this.distanciaAlTarget = Infinity;
-    juego.targetCamara = this.protagonista;
+    juego.targetCamara = juego.protagonista;
     // this.asignarTarget(this.juego.mouse);
-    this.registerEventListeners()
+    this.agregarEventListenersDelTeclado();
     this.assassinFSM = createFSM('idle', {
       'idle': {
         'moveUp': { target: 'movingUp', action: () => { this.cambiarAnimacion("caminarArriba") } },
@@ -22,84 +21,93 @@ class Asesino extends Persona {
         'shoot': { target: 'shooting', action: () => console.log('Asesino disparando (desde idle)') }
       },
       'movingUp': {
-        'stop': { target: 'idle', action: () => console.log('Asesino se detiene (arriba)') },
+        'stop': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } },
         'shoot': { target: 'shooting', action: () => console.log('Asesino disparando (desde arriba)') },
-        'moveDown': { target: 'movingDown', action: () => console.log('Asesino cambiando de dirección hacia abajo') },
-        'moveLeft': { target: 'movingLeft', action: () => console.log('Asesino cambiando de dirección hacia la izquierda') },
-        'moveRight': { target: 'movingRight', action: () => console.log('Asesino cambiando de dirección hacia la derecha') }
+        'moveUp': { target: 'movingUp', action: () => { this.cambiarAnimacion("caminarArriba") } },
+        'moveDown': { target: 'movingDown', action: () => { this.cambiarAnimacion("caminarAbajo") } },
+        'moveLeft': { target: 'movingLeft', action: () => { this.cambiarAnimacion("caminarDerecha") } },
+        'moveRight': { target: 'movingRight', action: () => { this.cambiarAnimacion("caminarDerecha") } }
       },
       'movingDown': {
-        'stop': { target: 'idle', action: () => console.log('Asesino se detiene (abajo)') },
+        'stop': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } },
         'shoot': { target: 'shooting', action: () => console.log('Asesino disparando (desde abajo)') },
-        'moveUp': { target: 'movingUp', action: () => console.log('Asesino cambiando de dirección hacia arriba') },
-        'moveLeft': { target: 'movingLeft', action: () => console.log('Asesino cambiando de dirección hacia la izquierda') },
-        'moveRight': { target: 'movingRight', action: () => console.log('Asesino cambiando de dirección hacia la derecha') }
+        'moveUp': { target: 'movingUp', action: () => { this.cambiarAnimacion("caminarArriba") } },
+        'moveDown': { target: 'movingDown', action: () => { this.cambiarAnimacion("caminarAbajo") } },
+        'moveLeft': { target: 'movingLeft', action: () => { this.cambiarAnimacion("caminarDerecha") } },
+        'moveRight': { target: 'movingRight', action: () => { this.cambiarAnimacion("caminarDerecha") } }
       },
       'movingLeft': {
-        'stop': { target: 'idle', action: () => console.log('Asesino se detiene (izquierda)') },
+        'stop': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } },
         'shoot': { target: 'shooting', action: () => console.log('Asesino disparando (desde izquierda)') },
-        'moveUp': { target: 'movingUp', action: () => console.log('Asesino cambiando de dirección hacia arriba') },
-        'moveDown': { target: 'movingDown', action: () => console.log('Asesino cambiando de dirección hacia abajo') },
-        'moveRight': { target: 'movingRight', action: () => console.log('Asesino cambiando de dirección hacia la derecha') }
+        'moveUp': { target: 'movingUp', action: () => { this.cambiarAnimacion("caminarArriba") } },
+        'moveDown': { target: 'movingDown', action: () => { this.cambiarAnimacion("caminarAbajo") } },
+        'moveLeft': { target: 'movingLeft', action: () => { this.cambiarAnimacion("caminarDerecha") } },
+        'moveRight': { target: 'movingRight', action: () => { this.cambiarAnimacion("caminarDerecha") } }
       },
       'movingRight': {
-        'stop': { target: 'idle', action: () => console.log('Asesino se detiene (derecha)') },
+        'stop': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } },
         'shoot': { target: 'shooting', action: () => console.log('Asesino disparando (desde derecha)') },
-        'moveUp': { target: 'movingUp', action: () => console.log('Asesino cambiando de dirección hacia arriba') },
-        'moveDown': { target: 'movingDown', action: () => console.log('Asesino cambiando de dirección hacia abajo') },
-        'moveLeft': { target: 'movingLeft', action: () => console.log('Asesino cambiando de dirección hacia la izquierda') }
+        'moveUp': { target: 'movingUp', action: () => { this.cambiarAnimacion("caminarArriba") } },
+        'moveDown': { target: 'movingDown', action: () => { this.cambiarAnimacion("caminarAbajo") } },
+        'moveLeft': { target: 'movingLeft', action: () => { this.cambiarAnimacion("caminarDerecha") } },
+        'moveRight': { target: 'movingRight', action: () => { this.cambiarAnimacion("caminarDerecha") } }
       },
       'shooting': {
-        'stopShooting': { target: 'idle', action: () => console.log('Asesino deja de disparar') }
+        'stopShooting': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } }
       }
     });
     console.log("El Asesino fue insertado correctamente", textureData, x, y, juego)
-  }
-
-  registerEventListeners() {
-    document.addEventListener('keydown', (event) => { this.keysPressed[event.key] = true; });
-    document.addEventListener('keyup', (event) => { this.keysPressed[event.key] = false; });
   }
 
   updateMovement() {
     let direction = '';
     if (this.keysPressed['ArrowUp'] || this.keysPressed['w']) {
       direction = 'up';
-      this.cambiarAnimacion("caminarArriba");
       console.log('Asesino moviéndose hacia arriba');
       console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowDown'] || this.keysPressed['s']) {
       direction = 'down';
-      this.cambiarAnimacion("caminarAbajo");
-      console.log('Asesino moviéndose hacia abajo')
-      console.log("El movimiento se actualizo")
+      console.log('Asesino moviéndose hacia abajo');
+      console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowLeft'] || this.keysPressed['a']) {
       direction = 'left';
-      this.cambiarAnimacion("caminarDerecha");
-      console.log('Asesino moviéndose hacia la izquierda')
-      console.log("El movimiento se actualizo")
+      console.log('Asesino moviéndose hacia la izquierda');
+      console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowRight'] || this.keysPressed['d']) {
       direction = 'right';
-      this.cambiarAnimacion("caminarDerecha");
-      console.log('Asesino moviéndose hacia la derecha')
-      console.log("El movimiento se actualizo")
+      console.log('Asesino moviéndose hacia la derecha');
+      console.log("El movimiento se actualizo");
     }
+    
     if (direction) {
       this.move(direction);
-      // Actualiza el estado de la FSM
-      if (direction === 'up') {
-        this.assassinFSM.dispatch('moveUp');
-      } else if (direction === 'down') {
-        this.assassinFSM.dispatch('moveDown');
-      } else if (direction === 'left') {
-        this.assassinFSM.dispatch('moveLeft');
-      } else if (direction === 'right') {
-        this.assassinFSM.dispatch('moveRight');
+      // Actualiza el estado de la FSM (la FSM manejará las animaciones)
+      try {
+        if (direction === 'up') {
+          this.assassinFSM.dispatch('moveUp');
+        } else if (direction === 'down') {
+          this.assassinFSM.dispatch('moveDown');
+        } else if (direction === 'left') {
+          this.assassinFSM.dispatch('moveLeft');
+        } else if (direction === 'right') {
+          this.assassinFSM.dispatch('moveRight');
+        }
+      } catch (error) {
+        // Si hay un error, probablemente ya estamos en ese estado
+        console.warn('Error en FSM:', error.message);
       }
     } else {
       // Si no se presiona ninguna tecla, se detiene
       this.stop();
-      this.assassinFSM.dispatch('stop'); // Cambia el estado a 'idle'
+      // Solo hacer dispatch si no estamos ya en idle
+      const currentState = this.assassinFSM.getCurrentState();
+      if (currentState !== 'idle') {
+        try {
+          this.assassinFSM.dispatch('stop'); // Cambia el estado a 'idle' y la animación
+        } catch (error) {
+          console.warn('Error en FSM stop:', error.message);
+        }
+      }
     }
   }
   // Método para detener el movimiento
@@ -108,7 +116,7 @@ class Asesino extends Persona {
   }
   shoot(direction) {
     // Crear proyectil en Matter.js y PixiJS
-    const projectile = Matter.Bodies.circle(assassinBody.position.x, assassinBody.position.y, 5, {
+    const projectile = Matter.Bodies.circle(this.body.position.x, this.body.position.y, 5, {
       restitution: 0.5 // Puedes ajustar la restitución para el comportamiento del proyectil
     });
     // Añadir el proyectil al mundo de Matter.js
@@ -132,10 +140,10 @@ class Asesino extends Persona {
         console.warn('Dirección inválida para disparar:', direction);
     }
     // Transicionar a 'shooting' o manejar el fin del disparo
-    assassinFSM.dispatch('shoot'); // Cambiar el estado a 'shooting'
+    this.assassinFSM.dispatch('shoot');
     // Opcional: Puedes agregar lógica para manejar el fin del disparo después de un breve tiempo
     setTimeout(() => {
-      assassinFSM.dispatch('stopShooting'); // Regresar al estado idle después de disparar
+      this.assassinFSM.dispatch('stopShooting');
     }, 500); // El tiempo puede ser ajustado según la duración del disparo
   }
 

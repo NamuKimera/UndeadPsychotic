@@ -19,9 +19,6 @@ class Juego {
   height;
   debug = false;
   barrasDeVidaVisibles = true;
-  distanciaALaQueLosObjetosTienenTodaLaLuz = 157;
-  factorMagicoArriba = 2;
-  factorMagicoAbajo = 2.18;
   teclado = {};
   ahora = performance.now();
   BASE_Z_INDEX = 50000;
@@ -106,7 +103,6 @@ class Juego {
         friction: 1,
       }
     );
-
     // add all of the bodies to the world
     Composite.add(this.engine.world, [
       this.piso,
@@ -134,9 +130,6 @@ class Juego {
       resolution: 1,
       resizeTo: window,
     };
-    //inicializamos pixi con las opciones definidas anteriormente
-    //await indica q el codigo se frena hasta que el metodo init de la app de pixi haya terminado
-    //puede tardar 2ms, 400ms.. no lo sabemos :O
     await this.pixiApp.init(opcionesDePixi);
     // //agregamos el elementos canvas creado por pixi en el documento html
     document.body.appendChild(this.pixiApp.canvas);
@@ -161,14 +154,14 @@ class Juego {
     this.containerPrincipal.zIndex = Z_INDEX.containerPrincipal;
     this.pixiApp.stage.addChild(this.containerPrincipal);
     this.crearFondo();
-    this.crearParedes();
-    this.crearLocal();
+    this.crearParedes(0, 0, this.anchoDelMapa, this.altoDelMapa);
+    this.crearLocales();
     this.crearFuentes();
     this.crearSillas();
     this.crearPalmeras();
     this.crearAsesino();
     this.targetCamara = this.protagonista;
-    this.crearCiudadanos(20);
+    this.crearCiudadanos(40);
     this.crearPolicias(10);
   }
 
@@ -181,14 +174,10 @@ class Juego {
     this.containerPrincipal.addChild(this.fondo);
   }
 
-  crearParedes(){
-    const x1 = 0;
-    const y1 = 0;
-    const x2 = 3800;
-    const y2 = 2120;
+  crearParedes(x1, y1, x2, y2){
     const paredIzquierda = new Pared(this, x1, y1, x1, y2)
     const paredDerecha = new Pared(this, x2, y1, x2, y2)
-    const paredArriba = new Pared(this, x1, y1, x2, 0)
+    const paredArriba = new Pared(this, x1, y1, x2, y1)
     const paredAbajo = new Pared(this, x1, y2, x2, y2)
     this.paredes.push(paredIzquierda);
     this.paredes.push(paredDerecha);
@@ -199,59 +188,42 @@ class Juego {
   crearParedesDeLosLocales(){
 
   }
+  crearLocales(){
+    this.crearLocal(1920, 1080);
+    this.crearLocal(3840, 1080);
+  }
 
-  crearLocal() {
-    const x = 1920;
-    const y = 1080;
+  crearLocal(x, y) {
     const local = new Local(x, y, this, 1);
     this.objetosInanimados.push(local);
   }
 
   crearPalmeras() {
-    this.crearPalmera1()
-    this.crearPalmera2()
+    this.crearPalmera(900, 700)
+    this.crearPalmera(1000, 1400)
+    this.crearPalmera(3000, 800)
   }
 
-  crearPalmera1(){
-    const x = 900;
-    const y = 700;
-    const palmera = new Palmera(x, y, this, 0.5, 0.5);
-    this.objetosInanimados.push(palmera);
-  }
-
-  crearPalmera2(){
-    const x = 1000;
-    const y = 1400;
+  crearPalmera(x, y){
     const palmera = new Palmera(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(palmera);
   }
 
   crearFuentes() {
-    this.crearFuente1();
-    this.crearFuente2();
+    this.crearFuente(1400, 800);
+    this.crearFuente(3070, 1420);
   }
 
-  crearFuente1(){
-    const x = 3070;
-    const y = 1420;
-    const fuente1 = new Fuente(x, y, this, 0.5, 0.5);
-    this.objetosInanimados.push(fuente1);
-  }
-
-  crearFuente2(){
-    const x = 1400;
-    const y = 800;
-    const fuente2 = new Fuente(x, y, this, 0.5, 0.5);
-    this.objetosInanimados.push(fuente2);
+  crearFuente(x, y){
+    const fuente = new Fuente(x, y, this, 0.5, 0.5);
+    this.objetosInanimados.push(fuente);
   }
 
   crearSillas() {
-    this.crearSilla1()
+    this.crearSilla(650, 600)
   }
 
-  crearSilla1(){
-    const x = 650;
-    const y = 600;
+  crearSilla(x, y){
     const silla = new Silla(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(silla);
   }
@@ -303,7 +275,7 @@ class Juego {
     window.onkeyup = (event) => {
       this.teclado[event.key.toLowerCase()] = false;
       if (event.key.toLowerCase() == "u") {
-        this.hacerQLaCamaraSigaAAlguien();
+        this.hacerQLaCamaraSigaAlProtagonista();
       }
     };
   }
@@ -337,19 +309,6 @@ class Juego {
     for (let unaPersona of this.personas) {
       unaPersona.perseguidor = this.mouse;
     }
-  }
-
-  hacerQLaCamaraSigaAAlguien() {
-    if (!this.targetCamara) return;
-    // Ajustar la posición considerando el zoom actual
-    let targetX = -this.targetCamara.posicion.x * this.zoom + this.width / 2;
-    let targetY = -this.targetCamara.posicion.y * this.zoom + this.height / 2;
-    const x = (targetX - this.containerPrincipal.x) * 0.1;
-    const y = (targetY - this.containerPrincipal.y) * 0.1;
-    this.moverContainerPrincipalA(
-      this.containerPrincipal.x + x,
-      this.containerPrincipal.y + y
-    );
   }
 
   hacerQLaCamaraSigaAlProtagonista() {

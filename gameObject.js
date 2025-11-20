@@ -15,6 +15,7 @@ class GameObject {
   constructor(x, y, juego) {
     this.container = new PIXI.Container();
     this.container.label = "container";
+    this.keysPressed = [];
     this.vision = Math.random() * 200 + 1300;
     this.posicion = { x: x, y: y };
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };
@@ -27,7 +28,7 @@ class GameObject {
   }
 
   // Método para crear el cuerpo de Matter.js (puede ser sobreescrito por las subclases)
-  createBody() {
+  crearCuerpo() {
     // Implementación básica (puede ser sobreescrita)
     this.body = Matter.Bodies.rectangle(this.x, this.y, this.height, this.width, this.options); // Ejemplo
   }
@@ -38,6 +39,10 @@ class GameObject {
     }
   }
 
+  agregarEventListenersDelTeclado() {
+    document.addEventListener('keydown', (event) => { this.keysPressed[event.key] = true; });
+    document.addEventListener('keyup', (event) => { this.keysPressed[event.key] = false; });
+  }
   separacion() {
     let promedioDePosicionDeAquellosQEstanMuyCercaMio = { x: 0, y: 0 };
     let contador = 0;

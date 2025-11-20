@@ -13,7 +13,7 @@ class Pared {
   }
 
   async crearSprite() {
-    this.sprite = new PIXI.Sprite(await PIXI.Assets.load("/assets/pared.png"));
+    this.sprite = new PIXI.Sprite(await PIXI.Assets.load("assets/pared.png"));
     this.sprite.anchor.set(1, 1);
     this.container.addChild(this.sprite);
     this.sprite.scale.x = this.scaleX;

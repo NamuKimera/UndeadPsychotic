@@ -16,10 +16,10 @@ class Persona extends GameObject {
     this.rangoDeAtaque = this.radio * 3;
     this.body = null; // Cuerpo de Matter.js (inicialmente nulo)
     this.options = {};
-    this.createBody();
+    this.crearCuerpo();
   }
 
-  createBody() {
+  crearCuerpo() {
     this.body = Matter.Bodies.rectangle(this.x, this.y, 9, 25, {
       isStatic: false, // Las personas no son estáticas
       restitution: 0.5, // Rebote
@@ -30,24 +30,15 @@ class Persona extends GameObject {
 
   // Método para mover la persona
   move(direction) {
-    if (!this.body) return;
-    const velocidad = 5;
-    switch (direction) {
-      case 'up':
-        Matter.Body.setVelocity(this.body, { x: 0, y: -velocidad });
-        break;
-      case 'down':
-        Matter.Body.setVelocity(this.body, { x: 0, y: velocidad });
-        break;
-      case 'left':
-        Matter.Body.setVelocity(this.body, { x: -velocidad, y: 0 });
-        break;
-      case 'right':
-        Matter.Body.setVelocity(this.body, { x: velocidad, y: 0 });
-        break;
-      default:
-        Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
+    const speed = 5;
+    let velocity = { x: 0, y: 0 };
+    switch(direction) {
+      case 'up': velocity.y = -speed; break;
+      case 'down': velocity.y = speed; break;
+      case 'left': velocity.x = -speed; break;
+      case 'right': velocity.x = speed; break;
     }
+    Matter.Body.setVelocity(this.body, velocity);
   }
 
   // Método para retroceder (se llamará en el evento de colisión)
@@ -237,5 +228,8 @@ class Persona extends GameObject {
   render() {
     super.render();
     this.cambiarDeSpriteAnimadoSegunAngulo()
+    this.cambiarVelocidadDeAnimacionSegunVelocidadLineal();
+    this.verificarSiEstoyMuerto();
+
   }
 }
