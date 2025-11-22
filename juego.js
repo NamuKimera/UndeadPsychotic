@@ -25,8 +25,8 @@ class Juego {
 
   constructor() {
     this.updateDimensions();
-    this.anchoDelMapa = 3840;
-    this.altoDelMapa = 2160;
+    this.width = 3840;
+    this.height = 2160;
     this.mouse = { posicion: { x: 0, y: 0 } };
     this.zoom = 1;
     this.minZoom = 0.1;
@@ -34,7 +34,6 @@ class Juego {
     this.zoomStep = 0.1;
     this.initPIXI();
     this.initMatterJS();
-    this.setupResizeHandler();
   }
 
   initMatterJS() {
@@ -128,20 +127,6 @@ class Juego {
     this.crearNivel();
     this.ui = new UI(this);
   }
-  
-  setupResizeHandler() {
-    window.addEventListener("resize", () => {
-      this.updateDimensions();
-      if (this.pixiApp) {
-        this.pixiApp.renderer.resize(this.width, this.height);
-      }
-      // Redimensionar la RenderTexture del sistema de iluminación
-      if (this.sistemaDeIluminacion) {
-        this.sistemaDeIluminacion.redimensionarRenderTexture();
-      }
-      if (this.ui) this.ui.resize();
-    });
-  }
 
   updateDimensions() {
     this.width = window.innerWidth;
@@ -169,8 +154,8 @@ class Juego {
     this.fondo = new PIXI.Sprite(await PIXI.Assets.load("assets/piso2.png"));
     this.fondo.zIndex = -10;
     this.fondo.scale.set(1);
-    this.fondo.width = this.anchoDelMapa;
-    this.fondo.height = this.altoDelMapa;
+    this.fondo.width = this.width;
+    this.fondo.height = this.height;
     this.containerPrincipal.addChild(this.fondo);
   }
 
@@ -192,7 +177,6 @@ class Juego {
     this.crearLocal(1920, 1080);
     this.crearLocal(3840, 1080);
   }
-
   crearLocal(x, y) {
     const local = new Local(x, y, this, 1);
     this.objetosInanimados.push(local);
@@ -203,7 +187,6 @@ class Juego {
     this.crearPalmera(1000, 1400)
     this.crearPalmera(3000, 800)
   }
-
   crearPalmera(x, y){
     const palmera = new Palmera(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(palmera);
@@ -213,7 +196,6 @@ class Juego {
     this.crearFuente(1400, 800);
     this.crearFuente(3070, 1420);
   }
-
   crearFuente(x, y){
     const fuente = new Fuente(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(fuente);
@@ -222,7 +204,6 @@ class Juego {
   crearSillas() {
     this.crearSilla(650, 600)
   }
-
   crearSilla(x, y){
     const silla = new Silla(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(silla);
@@ -236,7 +217,6 @@ class Juego {
     this.personas.push(protagonista);
     this.protagonista = protagonista;
   }
-
   async crearCiudadanos(cant) {
     for (let i = 0; i < cant; i++) {
       const x = 2400;
@@ -247,7 +227,6 @@ class Juego {
       this.ciudadanos.push(civiles);
     }
   }
-
   async crearPolicias(cant) {
     for (let i = 0; i < cant; i++) {
       const x = 2550;
@@ -270,44 +249,18 @@ class Juego {
           this.mouse.posicion.x,
           this.mouse.posicion.y
         );
-      }
-    };
-    window.onkeyup = (event) => {
-      this.teclado[event.key.toLowerCase()] = false;
-      if (event.key.toLowerCase() == "u") {
-        this.hacerQLaCamaraSigaAlProtagonista();
-      }
+      };
     };
   }
-
-  getPersonaRandom() {
-    return this.personas[Math.floor(this.personas.length * Math.random())];
-  }
-
   agregarInteractividadDelMouse() {
     // Escuchar el evento mousemove
     this.pixiApp.canvas.onmousemove = (event) => {
       this.mouse.posicion = { x: event.x, y: event.y };
     };
   }
-  asignarTargets() {
-    for (let unaPersona of this.personas) {
-      unaPersona.asignarTarget(this.getPersonaRandom());
-    }
-  }
   asignarElMouseComoTargetATodosLosConejitos() {
     for (let unaPersona of this.personas) {
       unaPersona.asignarTarget(this.mouse);
-    }
-  }
-  asignarPerseguidorRandomATodos() {
-    for (let unaPersona of this.personas) {
-      unaPersona.perseguidor = this.getPersonaRandom();
-    }
-  }
-  asignarElMouseComoPerseguidorATodosLosConejitos() {
-    for (let unaPersona of this.personas) {
-      unaPersona.perseguidor = this.mouse;
     }
   }
 
@@ -323,31 +276,26 @@ class Juego {
     this.moverContainerPrincipalA(this.containerPrincipal.x + x, this.containerPrincipal.y + y);
     console.log("La camara funciona")
   }
-
   moverContainerPrincipalA(x, y) {
     this.containerPrincipal.x = x;
     this.containerPrincipal.y = y;
     //this.containerBG.x = x;
     //this.containerBG.y = y;
   }
-
   cambiarZoom(zoom) {
     this.zoom = zoom;
     this.containerPrincipal.scale.set(this.zoom);
     // this.containerBG.scale.set(this.zoom);
   }
-
   calcularFPS() {
     this.deltaTime = performance.now() - this.ahora;
     this.ahora = performance.now();
     this.fps = 1000 / this.deltaTime;
     this.ratioDeltaTime = this.deltaTime / 16.66;
   }
-
   toggleDebug() {
     this.debug = !this.debug;
   }
-
   finDelJuego() {
     alert("Te moriste! fin del juego");
   }

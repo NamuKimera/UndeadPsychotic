@@ -230,6 +230,5 @@ class Persona extends GameObject {
     this.cambiarDeSpriteAnimadoSegunAngulo()
     this.cambiarVelocidadDeAnimacionSegunVelocidadLineal();
     this.verificarSiEstoyMuerto();
-
   }
 }

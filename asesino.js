@@ -56,7 +56,8 @@ class Asesino extends Persona {
         'stopShooting': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } }
       }
     });
-    console.log("El Asesino fue insertado correctamente", textureData, x, y, juego)
+    console.log("El Asesino fue insertado correctamente", textureData, x, y, juego);
+    this.crearCuerpo();
   }
 
   updateMovement() {
@@ -152,5 +153,9 @@ class Asesino extends Persona {
     this.noChocarConNingunaPared()
     this.updateMovement(); // Actualiza el movimiento y la FSM
     //Matter.Engine.update(engine);
+  }
+
+  render(){
+    super.render()
   }
 }
