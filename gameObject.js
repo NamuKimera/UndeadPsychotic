@@ -33,7 +33,7 @@ class GameObject {
     this.body = Matter.Bodies.rectangle(this.x, this.y, this.height, this.width, this.options); // Ejemplo
   }
   // Método para agregar el cuerpo al mundo
-  addToWorld(world) {
+  añadirAlMundo(world) {
     if (this.body) {
       Matter.World.add(world, this.body);
     }

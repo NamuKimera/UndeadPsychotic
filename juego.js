@@ -54,11 +54,7 @@ class Juego {
     // var boxA = Bodies.rectangle(400, 200, 80, 80);
     // var boxB = Bodies.rectangle(450, 50, 80, 80);
     // Crear bordes de la pantalla
-    this.piso = Bodies.rectangle(
-      this.width / 2,
-      this.height + 30,
-      this.width,
-      60,
+    this.piso = Bodies.rectangle(this.width / 2, this.height + 30, this.width, 60,
       {
         isStatic: true,
         friction: 1,
@@ -68,21 +64,12 @@ class Juego {
       isStatic: true,
       friction: 1,
     });
-    this.paredIzquierda = Bodies.rectangle(
-      -30,
-      this.height / 2,
-      60,
-      this.height,
-      {
-        isStatic: true,
-        friction: 1,
-      }
-    );
-    this.paredDerecha = Bodies.rectangle(
-      this.width + 30,
-      this.height / 2,
-      60,
-      this.height,
+    this.paredIzquierda = Bodies.rectangle(0, this.height / 2, 60, this.height, 
+    {
+      isStatic: true, 
+      friction: 1,
+    });
+    this.paredDerecha = Bodies.rectangle(this.width + 30, this.height / 2, 60, this.height,
       {
         isStatic: true,
         friction: 1,

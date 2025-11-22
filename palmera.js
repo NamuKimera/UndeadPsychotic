@@ -26,9 +26,13 @@ class Palmera extends EntidadEstatica {
         // Implementación básica (puede ser sobreescrita)
         this.body = Matter.Bodies.rectangle(this.x, this.y, 100, 600, this.options); // Ejemplo
     }
-
-    tick(){
+    añadirAlMundo(world) {
+        if (this.body) {
+            Matter.World.add(world, this.body);
+        }
+    }
+    tick() {
         super.tick();
-        this.addToWorld(engine.world);
+        this.añadirAlMundo(engine.world);
     }
 }
