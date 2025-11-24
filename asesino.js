@@ -56,6 +56,11 @@ class Asesino extends Persona {
         'stopShooting': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } }
       }
     });
+    this.ancho = 9;
+    this.alto = 25;
+    /*this.sprite.width = this.ancho;
+    this.sprite.height = this.alto;*/
+    this.crearCajitaDeMatterJS();
     console.log("El Asesino fue insertado correctamente", textureData, x, y, juego);
   }
   updateMovement() {
