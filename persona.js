@@ -4,18 +4,29 @@ class Persona extends GameObject {
   constructor(x, y, juego) {
     super(x, y, juego);
     this.container.label = "persona - " + this.id;
-    this.noPuedoPegarPeroEstoyEnCombate = false;
     this.muerto = false;
     this.nombre = generateName();
     this.rateOfFire = 600; //medido en milisegundos
     this.ultimoGolpe = 0;
-    this.coraje = Math.random();
     this.vision = Math.random() * 400 + 400;
     this.fuerzaDeAtaque = 0.05 + Math.random() * 0.05;
     this.radio = 7 + Math.random() * 3;
     this.rangoDeAtaque = this.radio * 3;
+    this.ancho = 9;
+    this.alto = 25;
+    this.crearCajitaDeMatterJS();
   }
-
+  crearCajitaDeMatterJS() {
+    this.persona = Matter.Bodies.rectangle(
+      this.posicion.x,
+      this.posicion.y,
+      this.ancho * 0.8,
+      this.alto * 0.8,
+      { restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
+    );
+    this.persona.angle = Math.random() * 3;
+    Matter.Composite.add(this.juego.engine.world, [this.persona]);
+  }
   // Método para mover la persona
   move(direction) {
     const speed = 5;
@@ -26,13 +37,13 @@ class Persona extends GameObject {
       case 'left': velocity.x = -speed; break;
       case 'right': velocity.x = speed; break;
     }
-    Matter.Body.setVelocity(this.body, velocity);
+    Matter.Body.setVelocity(this.persona, velocity);
   }
 
   // Método para retroceder (se llamará en el evento de colisión)
   retroceder(direction) {
     if (!this.body) return;
-    const velocidadRetroceso = 5; // Ajusta la velocidad de retroceso
+    const velocidadRetroceso = 5;
     switch (direction) {
       case 'left':
         Matter.Body.setVelocity(this.body, { x: velocidadRetroceso, y: 0 }); // Retroceder a la derecha
@@ -119,7 +130,6 @@ class Persona extends GameObject {
   meEstoyChocandoConAlgunaPared() {
     return this.meEstoyChocandoContraLaParedIzquierda() || this.meEstoyChocandoContraLaParedDerecha() || this.meEstoyChocandoContraLaParedAbajo() || this.meEstoyChocandoContraLaParedArriba()
   }
-
   noChocarConLaParedIzquierda() {
     if (this.meEstoyChocandoContraLaParedIzquierda()) {
       this.velocidad.x = 100
@@ -154,7 +164,6 @@ class Persona extends GameObject {
 
     }
   }
-
   getPersonasCerca() {
     return this.juego.personas.filter((persona) => calcularDistancia(this.posicion, persona.posicion) < this.vision && !persona.muerto);
   }
@@ -162,12 +171,10 @@ class Persona extends GameObject {
     //todas las personas en mi rango de vision
     this.personasCerca = this.getPersonasCerca();
   }
-
   calcularAnguloYVelocidadLineal() {
     this.angulo = radianesAGrados(Math.atan2(this.velocidad.y, this.velocidad.x)) + 180;
     this.velocidadLineal = calcularDistancia(this.velocidad, { x: 0, y: 0 });
   }
-
   verificarSiEstoyMuerto() {
     if (this.vida <= 0) {
       this.morir();
@@ -176,14 +183,12 @@ class Persona extends GameObject {
     this.vida += 0.0001;
     if (this.vida > this.vidaMaxima) this.vida = this.vidaMaxima;
   }
-
   quitarmeDeLosArrays() {
     this.juego.personas = this.juego.personas.filter((persona) => persona !== this);
     this.juego.policias = this.juego.policias.filter((persona) => persona !== this);
     this.juego.ciudadanos = this.juego.ciudadanos.filter((persona) => persona !== this);
     // console.log("quitarmeDeLosArrays", this.id);
   }
-
   morir() {
     if (this.muerto) return;
     this.container.label = "persona muerta - " + this.id;
@@ -195,7 +200,6 @@ class Persona extends GameObject {
     // Limpiar la barra de vida DESPUÉS de marcar como muerto
     this.quitarmeDeLosArrays();
   }
-
   recibirDanio(danio, deQuien) {
     this.vida -= danio;
     this.juego.particleSystem.hacerQueLeSalgaSangreAAlguien(this, deQuien);
@@ -207,12 +211,7 @@ class Persona extends GameObject {
     this.container.parent = null;
     this.container = null;
     this.sprite = null;
-    if (this.behaviorFSM) this.behaviorFSM.destroy();
-    this.behaviorFSM = null;
-    if (this.animationFSM) this.animationFSM.destroy();
-    this.animationFSM = null;
   }
-
   render() {
     super.render();
     this.cambiarDeSpriteAnimadoSegunAngulo()

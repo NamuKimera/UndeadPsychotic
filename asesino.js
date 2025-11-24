@@ -57,23 +57,7 @@ class Asesino extends Persona {
       }
     });
     console.log("El Asesino fue insertado correctamente", textureData, x, y, juego);
-    this.ancho = 9;
-    this.alto = 25;
-    this.crearCajitaDeMatterJS();
   }
-
-  crearCajitaDeMatterJS() {
-    this.asesino = Matter.Bodies.rectangle(
-      this.posicion.x,
-      this.posicion.y,
-      this.ancho * 0.8,
-      this.alto * 0.8,
-      { restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
-    );
-    this.asesino.angle = Math.random() * 3;
-    Matter.Composite.add(this.juego.engine.world, [this.asesino]);
-  }
-
   updateMovement() {
     let direction = '';
     if (this.keysPressed['ArrowUp'] || this.keysPressed['w']) {
@@ -113,7 +97,7 @@ class Asesino extends Persona {
       }
     } else {
       // Si no se presiona ninguna tecla, se detiene
-      this.stop();
+      // this.stop();
       // Solo hacer dispatch si no estamos ya en idle
       const currentState = this.assassinFSM.getCurrentState();
       if (currentState !== 'idle') {
@@ -126,9 +110,7 @@ class Asesino extends Persona {
     }
   }
   // Método para detener el movimiento
-  stop() {
-    Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
-  }
+  
   shoot(direction) {
     // Crear proyectil en Matter.js y PixiJS
     const projectile = Matter.Bodies.circle(this.body.position.x, this.body.position.y, 5, {

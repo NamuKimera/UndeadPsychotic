@@ -5,7 +5,6 @@ class Pared {
     this.x2 = x2;
     this.y1 = y1;
     this.y2 = y2;
-    this.sprite = null;
     this.container = new PIXI.Container();
     this.container.label = "pared" + this.id;
     // this.angulo = calcularAngulo()

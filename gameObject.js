@@ -21,8 +21,6 @@ class GameObject {
     this.velocidad = { x: Math.random() * 10, y: Math.random() * 10 };
     this.aceleracion = { x: 0, y: 0 };
     this.juego = juego;
-    this.body = null; // Cuerpo de Matter.js (inicialmente nulo)
-    this.options = {};
     this.id = Math.floor(Math.random() * 99999999);
     this.juego.containerPrincipal.addChild(this.container);
   }
@@ -58,7 +56,7 @@ class GameObject {
     this.aceleracion.x += vectorQueSeAlejaDelPromedioDePosicion.x * factor;
     this.aceleracion.y += vectorQueSeAlejaDelPromedioDePosicion.y * factor;
   }
-  /*cohesion() {
+  cohesion() {
     let cont = 0;
     //verctor vacio donde vamos a ir sumando posiciones
     let vectorPromedioDePosiciones = { x: 0, y: 0 };
@@ -94,14 +92,10 @@ class GameObject {
     vectorNuevo.y *= factorDistancia;
     this.aceleracion.x += this.factorCohesion * vectorNuevo.x;
     this.aceleracion.y += this.factorCohesion * vectorNuevo.y;
-  }*/
+  }
   rebotar() {
     //ejemplo mas realista
     if (this.posicion.x > this.juego.width || this.posicion.x < 0) {
-      //si la coordenada X de este conejito es mayor al ancho del stage,
-      //o si la coordenada X.. es menor q 0 (o sea q se fue por el lado izquierdo)
-      //multiplicamos por -0.99, o sea que se invierte el signo (si era positivo se hace negativo y vicecversa)
-      //y al ser 0.99 pierde 1% de velocidad
       this.velocidad.x *= -0.99;
     }
     if (this.posicion.y > this.juego.height || this.posicion.y < 0) {
@@ -162,7 +156,6 @@ class GameObject {
     this.aceleracion.x += this.factorAlineacion * vectorNuevo.x;
     this.aceleracion.y += this.factorAlineacion * vectorNuevo.y;
   }
-
   limitarAceleracion() {
     this.aceleracion = limitarVector(this.aceleracion, this.aceleracionMaxima);
   }
@@ -181,7 +174,9 @@ class GameObject {
     this.velocidad.x = x;
     this.velocidad.y = y;
   }
-
+  asignarPerseguidor(quien) {
+    this.perseguidor = quien;
+  }
   tick() {
     //TODO: hablar de deltatime
     this.separacion();

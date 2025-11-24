@@ -21,10 +21,8 @@ class Juego {
   barrasDeVidaVisibles = true;
   teclado = {};
   ahora = performance.now();
-  BASE_Z_INDEX = 50000;
 
   constructor() {
-    this.updateDimensions();
     this.width = 3840;
     this.height = 2160;
     this.mouse = { posicion: { x: 0, y: 0 } };
@@ -39,6 +37,8 @@ class Juego {
   initMatterJS() {
     // module aliases
     var Engine = Matter.Engine,
+      World = Matter.World,
+      Events = Matter.Events,
       Render = Matter.Render,
       Runner = Matter.Runner,
       Bodies = Matter.Bodies,
@@ -51,37 +51,13 @@ class Juego {
     //   engine: this.engine,
     // });
     // create two boxes and a ground
-    // var boxA = Bodies.rectangle(400, 200, 80, 80);
-    // var boxB = Bodies.rectangle(450, 50, 80, 80);
     // Crear bordes de la pantalla
-    this.piso = Bodies.rectangle(this.width / 2, this.height + 30, this.width, 60,
-      {
-        isStatic: true,
-        friction: 1,
-      }
-    );
-    this.techo = Bodies.rectangle(this.width / 2, -30, this.width, 60, {
-      isStatic: true,
-      friction: 1,
-    });
-    this.paredIzquierda = Bodies.rectangle(0, this.height / 2, 60, this.height, 
-    {
-      isStatic: true, 
-      friction: 1,
-    });
-    this.paredDerecha = Bodies.rectangle(this.width + 30, this.height / 2, 60, this.height,
-      {
-        isStatic: true,
-        friction: 1,
-      }
-    );
+    this.piso = Bodies.rectangle(this.width / 2, this.height, this.width, 60, { isStatic: true, friction: 1,});
+    this.techo = Bodies.rectangle(this.width / 2, 0, this.width, 60, { isStatic: true, friction: 1,});
+    this.paredIzquierda = Bodies.rectangle(0, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
+    this.paredDerecha = Bodies.rectangle(this.width, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
     // add all of the bodies to the world
-    Composite.add(this.engine.world, [
-      this.piso,
-      this.techo,
-      this.paredIzquierda,
-      this.paredDerecha,
-    ]);
+    Composite.add(this.engine.world, [this.piso, this.techo, this.paredIzquierda, this.paredDerecha]);
     // run the renderer
     if (this.matterRenderer) Render.run(this.matterRenderer);
     // create runner
@@ -102,30 +78,19 @@ class Juego {
       resizeTo: window,
     };
     await this.pixiApp.init(opcionesDePixi);
-    // //agregamos el elementos canvas creado por pixi en el documento html
     document.body.appendChild(this.pixiApp.canvas);
-    //agregamos el metodo this.gameLoop al ticker.
-    //es decir: en cada frame vamos a ejecutar el metodo this.gameLoop
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
-    this.agregarListenersDeTeclado();
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
     this.crearNivel();
     this.ui = new UI(this);
   }
-  
-  updateDimensions() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-  }
-
   async crearNivel() {
     this.containerPrincipal = new PIXI.Container();
     this.containerPrincipal.label = "containerPrincipal";
     this.containerPrincipal.zIndex = Z_INDEX.containerPrincipal;
     this.pixiApp.stage.addChild(this.containerPrincipal);
     this.crearFondo();
-    this.crearParedes(0, 0, 3800, 2120);
     this.crearLocales();
     this.crearFuentes();
     this.crearSillas();
@@ -142,19 +107,6 @@ class Juego {
     this.fondo.width = this.width;
     this.fondo.height = this.height;
     this.containerPrincipal.addChild(this.fondo);
-  }
-  crearParedes(x1, y1, x2, y2){
-    const paredIzquierda = new Pared(this, x1, y1, x1, y2)
-    const paredDerecha = new Pared(this, x2, y1, x2, y2)
-    const paredArriba = new Pared(this, x1, y1, x2, y1)
-    const paredAbajo = new Pared(this, x1, y2, x2, y2)
-    this.paredes.push(paredIzquierda);
-    this.paredes.push(paredDerecha);
-    this.paredes.push(paredArriba);
-    this.paredes.push(paredAbajo);
-  }
-  crearParedesDeLosLocales(){
-
   }
   crearLocales(){
     this.crearLocal(1920, 1080);
@@ -182,7 +134,8 @@ class Juego {
     this.objetosInanimados.push(fuente);
   }
   crearSillas() {
-    this.crearSilla(650, 600)
+    this.crearSilla(650, 1000)
+    this.crearSilla(2650, 1500)
   }
   crearSilla(x, y){
     const silla = new Silla(x, y, this, 0.5, 0.5);
