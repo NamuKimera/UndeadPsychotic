@@ -28,7 +28,7 @@ class Persona extends GameObject {
     Matter.Composite.add(this.juego.engine.world, [this.persona]);
   }
   // Método para mover la persona
-  move(direction) {
+  moverse(direction) {
     const speed = 5;
     let velocity = { x: 0, y: 0 };
     switch(direction) {
@@ -161,15 +161,9 @@ class Persona extends GameObject {
   }
   retrocederSiChocoConAlgunaPared() {
     if (this.meEstoyChocandoConAlgunaPared()) {
-
+      this.retroceder();
+      console.log(this.nombre, "retrocediendo por choque con pared")
     }
-  }
-  getPersonasCerca() {
-    return this.juego.personas.filter((persona) => calcularDistancia(this.posicion, persona.posicion) < this.vision && !persona.muerto);
-  }
-  percibirEntorno() {
-    //todas las personas en mi rango de vision
-    this.personasCerca = this.getPersonasCerca();
   }
   calcularAnguloYVelocidadLineal() {
     this.angulo = radianesAGrados(Math.atan2(this.velocidad.y, this.velocidad.x)) + 180;

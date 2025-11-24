@@ -4,7 +4,6 @@ class Policia extends Persona {
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")
     this.factorPerseguir = 0.9;
-    this.factorEscapar = 1 - this.coraje;
     this.distanciaParaLlegarALTarget = 500;
     this.factorRepelerSuavementeObstaculos = 0.66;
     this.factorAlineacion = 0.33;

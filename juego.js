@@ -177,11 +177,6 @@ class Juego {
       this.mouse.posicion = { x: event.x, y: event.y };
     };
   }
-  asignarElMouseComoTargetATodosLosConejitos() {
-    for (let unaPersona of this.personas) {
-      unaPersona.asignarTarget(this.mouse);
-    }
-  }
   hacerQLaCamaraSigaAlProtagonista() {
     if (!this.targetCamara) return;
     // Ajustar la posición considerando el zoom actual

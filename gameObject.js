@@ -1,5 +1,4 @@
 class GameObject {
-  //defino las propiedades q tiene mi clase, aunq podria no definirlas
   sprite;
   id;
   x = 0;
@@ -24,7 +23,6 @@ class GameObject {
     this.id = Math.floor(Math.random() * 99999999);
     this.juego.containerPrincipal.addChild(this.container);
   }
-
   agregarEventListenersDelTeclado() {
     document.addEventListener('keydown', (event) => { this.keysPressed[event.key] = true; });
     document.addEventListener('keyup', (event) => { this.keysPressed[event.key] = false; });
@@ -173,9 +171,6 @@ class GameObject {
   asignarVelocidad(x, y) {
     this.velocidad.x = x;
     this.velocidad.y = y;
-  }
-  asignarPerseguidor(quien) {
-    this.perseguidor = quien;
   }
   tick() {
     //TODO: hablar de deltatime

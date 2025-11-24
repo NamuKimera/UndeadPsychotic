@@ -63,28 +63,32 @@ class Asesino extends Persona {
     this.crearCajitaDeMatterJS();
     console.log("El Asesino fue insertado correctamente", textureData, x, y, juego);
   }
-  updateMovement() {
-    let direction = '';
+  actualizarMovimiento() {
+    let direction = 'idle';
     if (this.keysPressed['ArrowUp'] || this.keysPressed['w']) {
-      direction = 'up';
+      direction = 'movingUp';
+      this.moverse('movingUp');
       console.log('Asesino moviéndose hacia arriba');
       console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowDown'] || this.keysPressed['s']) {
-      direction = 'down';
+      direction = 'movingDown';
+      this.moverse('movingDown');
       console.log('Asesino moviéndose hacia abajo');
       console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowLeft'] || this.keysPressed['a']) {
-      direction = 'left';
+      direction = 'movingLeft';
+      this.moverse('movingLeft');
       console.log('Asesino moviéndose hacia la izquierda');
       console.log("El movimiento se actualizo");
     } else if (this.keysPressed['ArrowRight'] || this.keysPressed['d']) {
-      direction = 'right';
+      direction = 'movingRight';
+      this.moverse('movingRight');
       console.log('Asesino moviéndose hacia la derecha');
       console.log("El movimiento se actualizo");
     }
     
     if (direction) {
-      this.move(direction);
+      // this.moverse(direction);
       // Actualiza el estado de la FSM (la FSM manejará las animaciones)
       try {
         if (direction === 'up') {
@@ -101,9 +105,6 @@ class Asesino extends Persona {
         console.warn('Error en FSM:', error.message);
       }
     } else {
-      // Si no se presiona ninguna tecla, se detiene
-      // this.stop();
-      // Solo hacer dispatch si no estamos ya en idle
       const currentState = this.assassinFSM.getCurrentState();
       if (currentState !== 'idle') {
         try {
@@ -114,16 +115,11 @@ class Asesino extends Persona {
       }
     }
   }
-  // Método para detener el movimiento
   
-  shoot(direction) {
-    // Crear proyectil en Matter.js y PixiJS
-    const projectile = Matter.Bodies.circle(this.body.position.x, this.body.position.y, 5, {
-      restitution: 0.5 // Puedes ajustar la restitución para el comportamiento del proyectil
-    });
+  disparar(direction) {
+    const projectile = Matter.Bodies.circle(this.body.position.x, this.body.position.y, 5, { restitution: 0.5});
     // Añadir el proyectil al mundo de Matter.js
     Matter.World.add(engine.world, projectile);
-    // Aplicar velocidad al proyectil según la dirección
     const projectileSpeed = 10; // Ajusta la velocidad del proyectil según sea necesario
     switch (direction) {
       case 'up':
@@ -143,17 +139,13 @@ class Asesino extends Persona {
     }
     // Transicionar a 'shooting' o manejar el fin del disparo
     this.assassinFSM.dispatch('shoot');
-    // Opcional: Puedes agregar lógica para manejar el fin del disparo después de un breve tiempo
-    setTimeout(() => {
-      this.assassinFSM.dispatch('stopShooting');
-    }, 500); // El tiempo puede ser ajustado según la duración del disparo
+    setTimeout(() => {this.assassinFSM.dispatch('stopShooting')}, 500); // El tiempo puede ser ajustado según la duración del disparo
   }
 
   tick() {
     super.tick()
     this.noChocarConNingunaPared()
-    this.updateMovement(); // Actualiza el movimiento y la FSM
-    //Matter.Engine.update(engine);
+    this.actualizarMovimiento(); // Actualiza el movimiento y la FSM
   }
 
   render(){
