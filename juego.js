@@ -12,9 +12,6 @@ class Juego {
   personas = [];
   objetosInanimados = [];
   protagonista;
-  debug = false;
-  barrasDeVidaVisibles = true;
-  teclado = {};
   ahora = performance.now();
 
   constructor() {
@@ -32,8 +29,6 @@ class Juego {
   initMatterJS() {
     // module aliases
     var Engine = Matter.Engine,
-      World = Matter.World,
-      Events = Matter.Events,
       Render = Matter.Render,
       Runner = Matter.Runner,
       Bodies = Matter.Bodies,

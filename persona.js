@@ -6,9 +6,6 @@ class Persona extends GameObject {
     this.container.label = "persona - " + this.id;
     this.muerto = false;
     this.nombre = generateName();
-    this.rateOfFire = 600; //medido en milisegundos
-    this.ultimoGolpe = 0;
-    this.vision = Math.random() * 400 + 400;
     this.fuerzaDeAtaque = 0.05 + Math.random() * 0.05;
     this.radio = 7 + Math.random() * 3;
     this.rangoDeAtaque = this.radio * 3;
@@ -43,7 +40,6 @@ class Persona extends GameObject {
     }
     Matter.Body.setVelocity(this.body, velocity);
   }
-
   // Método para retroceder (se llamará en el evento de colisión)
   retroceder(direction) {
     if (!this.body) return;
@@ -65,7 +61,6 @@ class Persona extends GameObject {
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 }); // Detener si no hay dirección
     }
   }
-
   cambiarAnimacion(cual) {
     for (let key of Object.keys(this.spritesAnimados)) {
       this.spritesAnimados[key].visible = false;
@@ -107,18 +102,13 @@ class Persona extends GameObject {
       this.spritesAnimados[key].animationSpeed = this.velocidadLineal * 0.05 * this.juego.pixiApp.ticker.deltaTime;
     }
   }
-
   moverseUnaVezLlegadoAlObjetivo() {
-    /*
-      Con esto, los ciudadanos se mueven al azar por medio de un target, y con chanceDeCambiarAntesDeLlegar se calcula el porcentaje de cambiar de Target 
-    */
     const chanceDeCambiarAntesDeLlegar = Math.random() < 0.01
     if (calcularDistancia(this.posicion, this.target.posicion) < 100 || chanceDeCambiarAntesDeLlegar) {
       this.asignarTarget({ posicion: { x: Math.random() * this.juego.width, y: Math.random() * this.juego.height } });
       // console.log("El Ciudadano llego al Target")
     }
   }
-
   meEstoyChocandoContraLaParedIzquierda() {
     return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 100, 1080) ||
     intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 2000, 1080)
@@ -144,22 +134,26 @@ class Persona extends GameObject {
   }
   noChocarConLaParedIzquierda() {
     if (this.meEstoyChocandoContraLaParedIzquierda()) {
-      this.retroceder('left');
+      this.velocidad.x = 100
+      // console.log(this.nombre, "choco con pared izquierda")
     }
   }
   noChocarConLaParedDerecha() {
     if (this.meEstoyChocandoContraLaParedDerecha()) {
-      this.retroceder('right');
+      this.velocidad.x = -100
+      // console.log(this.nombre, "choco con pared derecha")
     }
   }
   noChocarConLaParedArriba() {
     if (this.meEstoyChocandoContraLaParedArriba()) {
-      this.retroceder('up');
+      this.velocidad.y = 100
+      // console.log(this.nombre, "choco con pared arriba")
     }
   }
   noChocarConLaParedAbajo() {
-    if (this.meEstoyChocandoContraLaParedAbajo()) {
-      this.retroceder('down');
+    if (this.meEstoyChocandoContraLaParedArriba()) {
+      this.velocidad.y = -100
+      // console.log(this.nombre, "choco con pared arriba")
     }
   }
   noChocarConNingunaPared() {
@@ -170,7 +164,7 @@ class Persona extends GameObject {
   }
   retrocederSiChocoConAlgunaPared() {
     if (this.meEstoyChocandoConAlgunaPared()) {
-      this.retroceder();
+      this.noChocarConNingunaPared();
       console.log(this.nombre, "retrocediendo por choque con pared")
     }
   }
@@ -207,7 +201,6 @@ class Persona extends GameObject {
     this.vida -= danio;
     this.juego.particleSystem.hacerQueLeSalgaSangreAAlguien(this, deQuien);
   }
-
   borrar() {
     this.juego.containerPrincipal.removeChild(this.container);
     this.quitarmeDeLosArrays();

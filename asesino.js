@@ -7,10 +7,7 @@ class Asesino extends Persona {
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")
     this.container.label = "prota";
-    this.factorIrAlTarget = 0.5;
-    this.distanciaAlTarget = Infinity;
     juego.targetCamara = juego.protagonista;
-    // this.asignarTarget(this.juego.mouse);
     this.agregarEventListenersDelTeclado();
     this.body.frictionAir = 0.05;
     this.assassinFSM = createFSM('idle', {
