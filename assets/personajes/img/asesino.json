@@ -406,26 +406,6 @@
       "a04.png",
       "a05.png"
     ],
-    "caminarDiagonalNE": [
-      "a06.png",
-      "a07.png",
-      "a08.png"
-    ],
-    "caminarDiagonalNO": [
-      "a11.png",
-      "a12.png",
-      "a13.png"
-    ],
-    "caminarDiagonalSE": [
-      "a06.png",
-      "a07.png",
-      "a08.png"
-    ],
-    "caminarDiagonalSO": [
-      "a11.png",
-      "a12.png",
-      "a13.png"
-    ],
     "dispararAbajo": [
       "a01.png"
     ],
@@ -437,18 +417,6 @@
     ],
     "dispararIzquierda": [
       "a10.png"
-    ],
-    "dispararDiagonalNE": [
-      "a14.png"
-    ],
-    "dispararDiagonalNO": [
-      "a15.png"
-    ],
-    "dispararDiagonalSE": [
-      "a14.png"
-    ],
-    "dispararDiagonalSO": [
-      "a15.png"
     ]
   },
   "meta": {
