@@ -39,10 +39,10 @@ class Juego {
     this.engine = Engine.create();
     this.engine.world.gravity.y = 0;
     // Crear bordes de la pantalla
-    this.piso = Bodies.rectangle(this.width / 2, this.height, this.width, 60, { isStatic: true, friction: 1,});
-    this.techo = Bodies.rectangle(this.width / 2, 0, this.width, 60, { isStatic: true, friction: 1,});
-    this.paredIzquierda = Bodies.rectangle(0, this.height, 60, this.height, { isStatic: true, friction: 1,});
-    this.paredDerecha = Bodies.rectangle(this.width, this.height, 60, this.height, { isStatic: true, friction: 1,});
+    this.piso = Bodies.rectangle(this.width / 2, this.height + 30, this.width, 60, { isStatic: true, friction: 1,});
+    this.techo = Bodies.rectangle(this.width / 2, -30, this.width, 60, { isStatic: true, friction: 1,});
+    this.paredIzquierda = Bodies.rectangle(-30, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
+    this.paredDerecha = Bodies.rectangle(this.width + 30, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
     // add all of the bodies to the world
     Composite.add(this.engine.world, [this.piso, this.techo, this.paredIzquierda, this.paredDerecha]);
     // Detector de colisiones
@@ -68,8 +68,24 @@ class Juego {
           console.log("Colisión detectada: Atacante colisiona con Ciudadano");
           personaB.recibirDanio(100, personaA);
         } else if ((personaB === this.protagonista || personaB instanceof Policia) && personaA instanceof Ciudadano) {
-          console.log("Colisión detectada: Atacante colisiona con Ciudadano");
+          console.log("Colisión detectada: Atacante colisiona con Policia");
           personaA.recibirDanio(100, personaB);
+        }
+        
+        if (personaA instanceof Ciudadano && personaB === this.protagonista) {
+          console.log("Colisión detectada: Ciudadano toca al Asesino");
+          personaA.recibirDanio(100, personaB);
+        } else if (personaB instanceof Ciudadano && personaA === this.protagonista) {
+          console.log("Colisión detectada: Ciudadano toca al Asesino");
+          personaB.recibirDanio(100, personaA);
+        }
+        
+        if (personaA instanceof Policia && personaB === this.protagonista) {
+          console.log("Colisión detectada: Policía toca al Asesino");
+          personaB.recibirDanio(10, personaA);
+        } else if (personaB instanceof Policia && personaA === this.protagonista) {
+          console.log("Colisión detectada: Policía toca al Asesino");
+          personaA.recibirDanio(10, personaB);
         }
       }
     }

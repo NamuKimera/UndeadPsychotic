@@ -8,6 +8,8 @@ class Persona extends GameObject {
     this.nombre = generateName();
     this.ancho = 10;
     this.alto = 25;
+    this.vida = 100;
+    this.vidaMaxima = 100;
     this.crearCajitaDeMatterJS();
   }
   crearCajitaDeMatterJS() {
@@ -127,27 +129,39 @@ class Persona extends GameObject {
     this.meEstoyChocandoContraLaParedAbajo();
   }
   noChocarConLaParedIzquierda() {
-    if (this.meEstoyChocandoContraLaParedIzquierda()) {
-      this.velocidad.x = 100
-      // console.log(this.nombre, "choco con pared izquierda")
+    if (this.posicion.x < 50) {
+      this.posicion.x = 50;
+      Matter.Body.setPosition(this.body, this.posicion);
+      if (this.body.velocity.x < 0) {
+        Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+      }
     }
   }
   noChocarConLaParedDerecha() {
-    if (this.meEstoyChocandoContraLaParedDerecha()) {
-      this.velocidad.x = -100
-      // console.log(this.nombre, "choco con pared derecha")
+    if (this.posicion.x > this.juego.width - 50) {
+      this.posicion.x = this.juego.width - 50;
+      Matter.Body.setPosition(this.body, this.posicion);
+      if (this.body.velocity.x > 0) {
+        Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+      }
     }
   }
   noChocarConLaParedArriba() {
-    if (this.meEstoyChocandoContraLaParedArriba()) {
-      this.velocidad.y = 100
-      // console.log(this.nombre, "choco con pared arriba")
+    if (this.posicion.y < 50) {
+      this.posicion.y = 50;
+      Matter.Body.setPosition(this.body, this.posicion);
+      if (this.body.velocity.y < 0) {
+        Matter.Body.setVelocity(this.body, { x: this.body.velocity.x, y: 0 });
+      }
     }
   }
   noChocarConLaParedAbajo() {
-    if (this.meEstoyChocandoContraLaParedArriba()) {
-      this.velocidad.y = -100
-      // console.log(this.nombre, "choco con pared arriba")
+    if (this.posicion.y > this.juego.height - 50) {
+      this.posicion.y = this.juego.height - 50;
+      Matter.Body.setPosition(this.body, this.posicion);
+      if (this.body.velocity.y > 0) {
+        Matter.Body.setVelocity(this.body, { x: this.body.velocity.x, y: 0 });
+      }
     }
   }
   noChocarConNingunaPared() {
@@ -175,10 +189,9 @@ class Persona extends GameObject {
     if (this.vida > this.vidaMaxima) this.vida = this.vidaMaxima;
   }
   quitarmeDeLosArrays() {
-    this.juego.personas = this.juego.personas.filter((persona) => persona !== this);
-    this.juego.policias = this.juego.policias.filter((persona) => persona !== this);
-    this.juego.ciudadanos = this.juego.ciudadanos.filter((persona) => persona !== this);
-    // console.log("quitarmeDeLosArrays", this.id);
+    if (this.juego.personas) {
+      this.juego.personas = this.juego.personas.filter((persona) => persona !== this);
+    }
   }
   morir() {
     if (this.muerto) return;

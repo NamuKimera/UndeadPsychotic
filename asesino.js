@@ -101,6 +101,11 @@ class Asesino extends Persona {
     this.calcularAnguloYVelocidadLineal();
   }
 
+  morir() {
+    super.morir();
+    this.juego.finDelJuego();
+  }
+
   render(){
     this.container.x = this.posicion.x;
     this.container.y = this.posicion.y;

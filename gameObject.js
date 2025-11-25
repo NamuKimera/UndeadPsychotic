@@ -170,6 +170,10 @@ class GameObject {
     this.velocidad.x = x;
     this.velocidad.y = y;
   }
+
+  finDelJuego() {
+    alert("Te moriste! fin del juego");
+  }
   tick() {
     //TODO: hablar de deltatime
     this.separacion();
