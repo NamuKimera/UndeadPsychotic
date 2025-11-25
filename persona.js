@@ -6,9 +6,6 @@ class Persona extends GameObject {
     this.container.label = "persona - " + this.id;
     this.muerto = false;
     this.nombre = generateName();
-    this.fuerzaDeAtaque = 0.05 + Math.random() * 0.05;
-    this.radio = 7 + Math.random() * 3;
-    this.rangoDeAtaque = this.radio * 3;
     this.ancho = 10;
     this.alto = 25;
     this.crearCajitaDeMatterJS();
@@ -81,9 +78,6 @@ class Persona extends GameObject {
     }
   }
   cambiarDeSpriteAnimadoSegunAngulo() {
-    //0 grados es a la izq, abre en sentido horario, por lo cual 180 es a la derecha
-    //90 es para arriba
-    //270 abajo
     if ((this.angulo > 315 && this.angulo < 360) || this.angulo < 45) {
       this.cambiarAnimacion("caminarDerecha");
       this.spritesAnimados.caminarDerecha.scale.x = -15;

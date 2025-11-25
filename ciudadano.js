@@ -3,8 +3,6 @@ class Ciudadano extends Persona {
     super(x, y, juego);
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")
-    this.ancho = 10;
-    this.alto = 25;
     this.asignarTarget({ posicion: { x: Math.random() * this.juego.width, y: Math.random() * this.juego.height } });
   }
 

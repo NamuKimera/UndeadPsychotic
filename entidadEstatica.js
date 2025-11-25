@@ -24,6 +24,4 @@ class EntidadEstatica extends GameObject {
     this.persona.angle = Math.random() * 3;
     Matter.Composite.add(this.juego.engine.world, [this.persona]);
   }
-
-  tick() { }
 }

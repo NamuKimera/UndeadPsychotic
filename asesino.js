@@ -54,12 +54,9 @@ class Asesino extends Persona {
         'stopShooting': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } }
       }
     });
-    this.ancho = 10;
-    this.alto = 25;
   }
   actualizarMovimiento() {
     let direction = 'idle';
-    
     if (this.keysPressed['ArrowUp'] || this.keysPressed['w']) {
       direction = 'movingUp';
     } else if (this.keysPressed['ArrowDown'] || this.keysPressed['s']) {
@@ -69,7 +66,6 @@ class Asesino extends Persona {
     } else if (this.keysPressed['ArrowRight'] || this.keysPressed['d']) {
       direction = 'movingRight';
     }
-    
     if (direction !== 'idle') {
       this.moverse(direction);
       try {
@@ -96,8 +92,8 @@ class Asesino extends Persona {
       }
     }
   }
-
   tick() {
+    super.tick();
     this.actualizarMovimiento();
     this.posicion.x = this.body.position.x;
     this.posicion.y = this.body.position.y;
