@@ -22,6 +22,7 @@ class Juego {
     this.minZoom = 0.1;
     this.maxZoom = 2;
     this.zoomStep = 0.1;
+    this.camaraVelocidad = 0.1;
     this.initPIXI();
     this.initMatterJS();
   }
@@ -32,7 +33,8 @@ class Juego {
       Render = Matter.Render,
       Runner = Matter.Runner,
       Bodies = Matter.Bodies,
-      Composite = Matter.Composite;
+      Composite = Matter.Composite,
+      Events = Matter.Events;
     // create an engine
     this.engine = Engine.create();
     this.engine.world.gravity.y = 0;
@@ -43,12 +45,34 @@ class Juego {
     this.paredDerecha = Bodies.rectangle(this.width, this.height, 60, this.height, { isStatic: true, friction: 1,});
     // add all of the bodies to the world
     Composite.add(this.engine.world, [this.piso, this.techo, this.paredIzquierda, this.paredDerecha]);
+    // Detector de colisiones
+    Events.on(this.engine, 'collisionStart', (event) => {this.manejarColisiones(event.pairs);});
     // run the renderer
     if (this.matterRenderer) Render.run(this.matterRenderer);
     // create runner
     this.matterRunner = Runner.create();
     // run the engine
     Runner.run(this.matterRunner, this.engine);
+  }
+
+  manejarColisiones(pairs) {
+    for (let pair of pairs) {
+      const bodyA = pair.bodyA;
+      const bodyB = pair.bodyB;
+      
+      const personaA = this.personas.find(p => p.body === bodyA);
+      const personaB = this.personas.find(p => p.body === bodyB);
+      
+      if (personaA && personaB) {
+        if ((personaA === this.protagonista || personaA instanceof Policia) && personaB instanceof Ciudadano) {
+          console.log("Colisión detectada: Atacante colisiona con Ciudadano");
+          personaB.recibirDanio(100, personaA);
+        } else if ((personaB === this.protagonista || personaB instanceof Policia) && personaA instanceof Ciudadano) {
+          console.log("Colisión detectada: Atacante colisiona con Ciudadano");
+          personaA.recibirDanio(100, personaB);
+        }
+      }
+    }
   }
   async initPIXI() {
     //creamos la aplicacion de pixi y la guardamos en la propiedad pixiApp
@@ -134,7 +158,7 @@ class Juego {
   }
   async crearCiudadanos(cant) {
     for (let i = 0; i < cant; i++) {
-      const x = 2400;
+      const x = 2000;
       const y = 1600;
       const animacionesCiudadano = await PIXI.Assets.load("assets/personajes/img/ciudadano.json");
       const civiles = new Ciudadano(animacionesCiudadano, x, y, this);
@@ -143,7 +167,7 @@ class Juego {
   }
   async crearPolicias(cant) {
     for (let i = 0; i < cant; i++) {
-      const x = 2550;
+      const x = 2000;
       const y = 1500;
       const animacionesPolicia = await PIXI.Assets.load("assets/personajes/img/policia.json");
       const policia = new Policia(animacionesPolicia, x, y, this);
@@ -156,30 +180,25 @@ class Juego {
       this.mouse.posicion = { x: event.x, y: event.y };
     };
   }
-  hacerQLaCamaraSigaAlAsesino() {
-    if (!this.protagonista) return;
-    this.targetCamara = this.protagonista;
-  }
   hacerQLaCamaraSigaAlProtagonista() {
     if (!this.targetCamara) return;
-    let targetX = -this.targetCamara.posicion.x + this.width / 2;
-    let targetY = -this.targetCamara.posicion.y + this.height / 2;
-    this.containerPrincipal.x = targetX;
-    this.containerPrincipal.y = targetY;
+    // Ajustar la posición considerando el zoom actual
+    let targetX = -this.targetCamara.posicion.x * this.zoom + this.width / 2;
+    let targetY = -this.targetCamara.posicion.y * this.zoom + this.height / 2;
+
+    const x = (targetX - this.containerPrincipal.x) * 0.1;
+    const y = (targetY - this.containerPrincipal.y) * 0.1;
+
+    this.moverContainerPrincipalA(
+      this.containerPrincipal.x + x,
+      this.containerPrincipal.y + y
+    );
   }
   moverContainerPrincipalA(x, y) {
     this.containerPrincipal.x = x;
     this.containerPrincipal.y = y;
-    //this.containerBG.x = x;
-    //this.containerBG.y = y;
-  }
-  cambiarZoom(zoom) {
-    this.zoom = zoom;
-    this.containerPrincipal.scale.set(this.zoom);
-    // this.containerBG.scale.set(this.zoom);
-  }
-  toggleDebug() {
-    this.debug = !this.debug;
+    this.containerBG.x = x;
+    this.containerBG.y = y;
   }
   finDelJuego() {
     alert("Te moriste! fin del juego");

@@ -1,8 +1,6 @@
 class GameObject {
   sprite;
   id;
-  x = 0;
-  y = 0;
   target;
   perseguidor;
   aceleracionMaxima = 0.2;

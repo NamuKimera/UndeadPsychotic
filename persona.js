@@ -183,17 +183,21 @@ class Persona extends GameObject {
   morir() {
     if (this.muerto) return;
     this.container.label = "persona muerta - " + this.id;
-    this.quitarSombra();
-    this.quitarBarritaVida();
-    this.sprite.loop = false;
-    // Marcar como muerto PRIMERO para evitar que se actualice la barra durante el proceso
+    Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
+    Matter.Body.setAngularVelocity(this.body, 0);
+    Matter.Composite.remove(this.juego.engine.world, this.body);
+    if (this.container.parent) {
+      this.container.parent.removeChild(this.container);
+    }
+    for (let key of Object.keys(this.spritesAnimados)) {
+      this.spritesAnimados[key].stop();
+      this.spritesAnimados[key].visible = false;
+    }
     this.muerto = true;
-    // Limpiar la barra de vida DESPUÉS de marcar como muerto
     this.quitarmeDeLosArrays();
   }
   recibirDanio(danio, deQuien) {
     this.vida -= danio;
-    this.juego.particleSystem.hacerQueLeSalgaSangreAAlguien(this, deQuien);
   }
   borrar() {
     this.juego.containerPrincipal.removeChild(this.container);
