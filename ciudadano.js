@@ -3,7 +3,7 @@ class Ciudadano extends Persona {
     super(x, y, juego);
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")
-    this.ancho = 9;
+    this.ancho = 10;
     this.alto = 25;
     /*this.sprite.width = this.ancho;
     this.sprite.height = this.alto;*/

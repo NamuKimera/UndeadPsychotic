@@ -56,7 +56,7 @@ class Asesino extends Persona {
         'stopShooting': { target: 'idle', action: () => { this.cambiarAnimacion("idleAbajo") } }
       }
     });
-    this.ancho = 9;
+    this.ancho = 10;
     this.alto = 25;
     /*this.sprite.width = this.ancho;
     this.sprite.height = this.alto;*/

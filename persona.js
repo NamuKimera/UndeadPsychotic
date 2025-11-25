@@ -12,7 +12,7 @@ class Persona extends GameObject {
     this.fuerzaDeAtaque = 0.05 + Math.random() * 0.05;
     this.radio = 7 + Math.random() * 3;
     this.rangoDeAtaque = this.radio * 3;
-    this.ancho = 9;
+    this.ancho = 10;
     this.alto = 25;
     this.crearCajitaDeMatterJS();
   }
@@ -115,58 +115,43 @@ class Persona extends GameObject {
     }
   }
 
-  meEstoyChocandoContraLaParedIzquierda1() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 100, 1080)
+  meEstoyChocandoContraLaParedIzquierda() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 100, 1080) ||
+    intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 2000, 1080)
   }
-  meEstoyChocandoContraLaParedIzquierda2() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 2000, 1080)
+  meEstoyChocandoContraLaParedDerecha() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1400, 450, 1900, 1080) ||
+    intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3300, 450, 3800, 1080)
   }
-  meEstoyChocandoContraLaParedDerecha1() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1400, 450, 1900, 1080)
+  meEstoyChocandoContraLaParedArriba() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 1410, 450) ||
+    intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 3300, 450)
   }
-  meEstoyChocandoContraLaParedDerecha2() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3300, 450, 3800, 1080)
-  }
-  meEstoyChocandoContraLaParedArriba1() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 1410, 450)
-  }
-  meEstoyChocandoContraLaParedArriba2() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 3300, 450)
-  }
-  meEstoyChocandoContraLaParedAbajo1() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 0, 1080, 100, 1080)
-  }
-  meEstoyChocandoContraLaParedAbajo2() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1900, 1080, 2010, 1080)
-  }
-  meEstoyChocandoContraLaParedAbajo3() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3800, 1080, 3840, 1080)
+  meEstoyChocandoContraLaParedAbajo() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 0, 1080, 100, 1080) ||
+    intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1900, 1080, 2010, 1080) || 
+    intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3800, 1080, 3840, 1080)
   }
   meEstoyChocandoConAlgunaPared() {
-    return this.meEstoyChocandoContraLaParedIzquierda1() || 
-    this.meEstoyChocandoContraLaParedIzquierda2() || 
-    this.meEstoyChocandoContraLaParedDerecha1() ||
-    this.meEstoyChocandoContraLaParedDerecha2() ||
-    this.meEstoyChocandoContraLaParedArriba1() ||
-    this.meEstoyChocandoContraLaParedArriba2() ||
-    this.meEstoyChocandoContraLaParedAbajo1() ||
-    this.meEstoyChocandoContraLaParedAbajo2()||
-    this.meEstoyChocandoContraLaParedAbajo3();
+    return this.meEstoyChocandoContraLaParedIzquierda() || 
+    this.meEstoyChocandoContraLaParedDerecha() ||
+    this.meEstoyChocandoContraLaParedArriba() ||
+    this.meEstoyChocandoContraLaParedAbajo();
   }
   noChocarConLaParedIzquierda() {
-    if (this.meEstoyChocandoContraLaParedIzquierda1() || this.meEstoyChocandoContraLaParedIzquierda2()) {
+    if (this.meEstoyChocandoContraLaParedIzquierda()) {
       this.velocidad.x = 100
       // console.log(this.nombre, "choco con pared izquierda")
     }
   }
   noChocarConLaParedDerecha() {
-    if (this.meEstoyChocandoContraLaParedDerecha1() || this.meEstoyChocandoContraLaParedDerecha2()) {
-      this.velocidad.y = 100
+    if (this.meEstoyChocandoContraLaParedDerecha()) {
+      this.velocidad.x = -100
       // console.log(this.nombre, "choco con pared derecha")
     }
   }
   noChocarConLaParedArriba() {
-    if (this.meEstoyChocandoContraLaParedArriba1() || this.meEstoyChocandoContraLaParedArriba2()) {
+    if (this.meEstoyChocandoContraLaParedArriba()) {
       this.velocidad.y = 100
       // console.log(this.nombre, "choco con pared arriba")
     }

@@ -12,8 +12,6 @@ class Juego {
   personas = [];
   objetosInanimados = [];
   protagonista;
-  width;
-  height;
   debug = false;
   barrasDeVidaVisibles = true;
   teclado = {};
@@ -42,17 +40,11 @@ class Juego {
       Composite = Matter.Composite;
     // create an engine
     this.engine = Engine.create();
-    // create a renderer
-    // this.matterRenderer = Render.create({
-    //   element: document.body,
-    //   engine: this.engine,
-    // });
-    // create two boxes and a ground
     // Crear bordes de la pantalla
     this.piso = Bodies.rectangle(this.width / 2, this.height, this.width, 60, { isStatic: true, friction: 1,});
     this.techo = Bodies.rectangle(this.width / 2, 0, this.width, 60, { isStatic: true, friction: 1,});
-    this.paredIzquierda = Bodies.rectangle(0, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
-    this.paredDerecha = Bodies.rectangle(this.width, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
+    this.paredIzquierda = Bodies.rectangle(0, this.height, 60, this.height, { isStatic: true, friction: 1,});
+    this.paredDerecha = Bodies.rectangle(this.width, this.height, 60, this.height, { isStatic: true, friction: 1,});
     // add all of the bodies to the world
     Composite.add(this.engine.world, [this.piso, this.techo, this.paredIzquierda, this.paredDerecha]);
     // run the renderer
@@ -136,7 +128,6 @@ class Juego {
     const silla = new Silla(x, y, this, 0.5, 0.5);
     this.objetosInanimados.push(silla);
   }
-
   async crearAsesino() {
     const x = 900;
     const y = 500;
@@ -163,7 +154,6 @@ class Juego {
       this.personas.push(policia);
     }
   }
-  
   agregarInteractividadDelMouse() {
     // Escuchar el evento mousemove
     this.pixiApp.canvas.onmousemove = (event) => {
@@ -202,13 +192,8 @@ class Juego {
 
   gameLoop(time) {
     console.log("gameLoop", time, this.ahora);
-    //borrar lo q hay en los graficos debug
-    if (this.graficoDebug) this.graficoDebug.clear();
     for (let unpersona of this.personas) unpersona.tick();
     for (let unpersona of this.personas) unpersona.render();
-    if (this.ui) this.ui.tick();
     this.hacerQLaCamaraSigaAlProtagonista();
-    this.calcularFPS();
-    if (!this.debug) return;
   }
 }

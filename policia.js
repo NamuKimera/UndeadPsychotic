@@ -8,7 +8,7 @@ class Policia extends Persona {
     this.factorRepelerSuavementeObstaculos = 0.66;
     this.factorAlineacion = 0.33;
     this.asignarTarget({ posicion: { x: Math.random() * this.juego.width, y: Math.random() * this.juego.height } }); // Al usar el ancho y alto del juego los ciudadanos se mueven al azar
-    this.ancho = 9;
+    this.ancho = 10;
     this.alto = 25;
     /*this.sprite.width = this.ancho;
     this.sprite.height = this.alto;*/
