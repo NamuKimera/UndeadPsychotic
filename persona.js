@@ -115,35 +115,58 @@ class Persona extends GameObject {
     }
   }
 
-  meEstoyChocandoContraLaParedIzquierda() {
+  meEstoyChocandoContraLaParedIzquierda1() {
     return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 100, 1080)
   }
-  meEstoyChocandoContraLaParedDerecha() {
+  meEstoyChocandoContraLaParedIzquierda2() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 2000, 1080)
+  }
+  meEstoyChocandoContraLaParedDerecha1() {
     return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1400, 450, 1900, 1080)
   }
-  meEstoyChocandoContraLaParedArriba() {
+  meEstoyChocandoContraLaParedDerecha2() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3300, 450, 3800, 1080)
+  }
+  meEstoyChocandoContraLaParedArriba1() {
     return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 510, 450, 1410, 450)
   }
-  meEstoyChocandoContraLaParedAbajo() {
-    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1830, 1080, 2160, 1080)
+  meEstoyChocandoContraLaParedArriba2() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 2410, 450, 3300, 450)
+  }
+  meEstoyChocandoContraLaParedAbajo1() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 0, 1080, 100, 1080)
+  }
+  meEstoyChocandoContraLaParedAbajo2() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 1900, 1080, 2010, 1080)
+  }
+  meEstoyChocandoContraLaParedAbajo3() {
+    return intersectaLineaCirculo(this.posicion.x, this.posicion.y, 50, 3800, 1080, 3840, 1080)
   }
   meEstoyChocandoConAlgunaPared() {
-    return this.meEstoyChocandoContraLaParedIzquierda() || this.meEstoyChocandoContraLaParedDerecha() || this.meEstoyChocandoContraLaParedAbajo() || this.meEstoyChocandoContraLaParedArriba()
+    return this.meEstoyChocandoContraLaParedIzquierda1() || 
+    this.meEstoyChocandoContraLaParedIzquierda2() || 
+    this.meEstoyChocandoContraLaParedDerecha1() ||
+    this.meEstoyChocandoContraLaParedDerecha2() ||
+    this.meEstoyChocandoContraLaParedArriba1() ||
+    this.meEstoyChocandoContraLaParedArriba2() ||
+    this.meEstoyChocandoContraLaParedAbajo1() ||
+    this.meEstoyChocandoContraLaParedAbajo2()||
+    this.meEstoyChocandoContraLaParedAbajo3();
   }
   noChocarConLaParedIzquierda() {
-    if (this.meEstoyChocandoContraLaParedIzquierda()) {
+    if (this.meEstoyChocandoContraLaParedIzquierda1() || this.meEstoyChocandoContraLaParedIzquierda2()) {
       this.velocidad.x = 100
       // console.log(this.nombre, "choco con pared izquierda")
     }
   }
   noChocarConLaParedDerecha() {
-    if (this.meEstoyChocandoContraLaParedDerecha()) {
+    if (this.meEstoyChocandoContraLaParedDerecha1() || this.meEstoyChocandoContraLaParedDerecha2()) {
       this.velocidad.y = 100
       // console.log(this.nombre, "choco con pared derecha")
     }
   }
   noChocarConLaParedArriba() {
-    if (this.meEstoyChocandoContraLaParedArriba()) {
+    if (this.meEstoyChocandoContraLaParedArriba1() || this.meEstoyChocandoContraLaParedArriba2()) {
       this.velocidad.y = 100
       // console.log(this.nombre, "choco con pared arriba")
     }
