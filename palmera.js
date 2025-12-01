@@ -4,6 +4,8 @@ class Palmera extends EntidadEstatica {
         this.radio = 20;
         this.scaleX = scaleX || 1;
         this.scaleY = scaleY || 1;
+        this.ancho = 80;
+        this.alto = 120;
         this.container.label = "Palmera" + this.id;
         this.crearSprite();
         this.crearCajitaDeMatterJS();
@@ -18,21 +20,5 @@ class Palmera extends EntidadEstatica {
         this.container.zIndex = 1;
         this.render();
         console.log("La palmera se inserto correctamente")
-    }
-
-    crearCajitaDeMatterJS() {
-        this.cajita = Matter.Bodies.rectangle(
-            this.posicion.x,
-            this.posicion.y,
-            this.ancho * 0.8,
-            this.alto * 0.8,
-            { restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
-        );
-        this.cajita.angle = Math.random() * 3;
-        Matter.Composite.add(this.juego.engine.world, [this.cajita]);
-    }
-
-    tick() {
-        super.tick();
     }
 }

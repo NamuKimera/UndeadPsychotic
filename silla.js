@@ -4,8 +4,11 @@ class Silla extends EntidadEstatica {
         this.radio = 10;
         this.scaleX = scaleX || 1;
         this.scaleY = scaleY || 1;
+        this.ancho = 50;
+        this.alto = 50;
         this.container.label = "silla" + this.id;
         this.crearSprite();
+        this.crearCajitaDeMatterJS();
     }
 
     async crearSprite() {

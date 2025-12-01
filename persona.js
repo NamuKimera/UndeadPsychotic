@@ -5,8 +5,8 @@ class Persona extends GameObject {
     this.container.label = "persona - " + this.id;
     this.muerto = false;
     this.nombre = generateName();
-    this.ancho = 10;
-    this.alto = 25;
+    this.ancho = 32;
+    this.alto = 32;
     this.vida = 100;
     this.vidaMaxima = 100;
     this.crearCajitaDeMatterJS();
@@ -20,6 +20,7 @@ class Persona extends GameObject {
       { restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
     );
     this.body.angle = Math.random() * 3;
+    this.body.gameObject = this;
     Matter.Composite.add(this.juego.engine.world, [this.body]);
   }
   // Método para mover la persona

@@ -1,6 +1,7 @@
 const Z_INDEX = {
   containerPrincipal: 3,
   containerAsesino: 5,
+  containerDebug: 10,
 };
 
 class Juego {
@@ -8,6 +9,7 @@ class Juego {
   personas = [];
   objetosInanimados = [];
   protagonista;
+  score = 0;
   ahora = performance.now();
 
   constructor() {
@@ -18,7 +20,8 @@ class Juego {
     this.minZoom = 0.1;
     this.maxZoom = 2;
     this.zoomStep = 0.1;
-    this.camaraVelocidad = 0.1;
+    this.camaraVelocidad = 1;
+    this.mostrarCollidersDebug = true;
     this.initPIXI();
     this.initMatterJS();
   }
@@ -39,6 +42,10 @@ class Juego {
     this.techo = Bodies.rectangle(this.width / 2, -30, this.width, 60, { isStatic: true, friction: 1,});
     this.paredIzquierda = Bodies.rectangle(-30, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
     this.paredDerecha = Bodies.rectangle(this.width + 30, this.height / 2, 60, this.height, { isStatic: true, friction: 1,});
+    this.piso.label = "piso";
+    this.techo.label = "techo";
+    this.paredIzquierda.label = "paredIzquierda";
+    this.paredDerecha.label = "paredDerecha";
     // add all of the bodies to the world
     Composite.add(this.engine.world, [this.piso, this.techo, this.paredIzquierda, this.paredDerecha]);
     // Detector de colisiones
@@ -55,17 +62,21 @@ class Juego {
     for (let pair of pairs) {
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
-      
-      const personaA = this.personas.find(p => p.body === bodyA);
-      const personaB = this.personas.find(p => p.body === bodyB);
-      
+      const objA = bodyA.gameObject;
+      const objB = bodyB.gameObject;
+      const personaA = objA instanceof Persona ? objA : null;
+      const personaB = objB instanceof Persona ? objB : null;
+      const objetoA = !personaA ? objA : null;
+      const objetoB = !personaB ? objB : null;
       if (personaA && personaB) {
         if (personaA === this.protagonista && personaB instanceof Ciudadano) {
           console.log("Colisión detectada: Asesino colisiona con Ciudadano");
           personaB.recibirDanio(100, personaA);
+          this.score += 100;
         } else if (personaB === this.protagonista && personaA instanceof Ciudadano) {
           console.log("Colisión detectada: Asesino colisiona con Ciudadano");
           personaA.recibirDanio(100, personaB);
+          this.score += 100;
         }
         
         if (personaA instanceof Ciudadano && personaB === this.protagonista) {
@@ -84,6 +95,22 @@ class Juego {
           personaA.recibirDanio(10, personaB);
         }
       }
+      
+      if (personaA && objetoB) {
+        console.log("Colisión detectada: Persona colisiona con objeto inanimado");
+      }
+      
+      if (personaB && objetoA) {
+        console.log("Colisión detectada: Persona colisiona con objeto inanimado");
+      }
+      
+      if (personaA && (bodyB.label === "piso" || bodyB.label === "techo" || bodyB.label === "paredIzquierda" || bodyB.label === "paredDerecha")) {
+        console.log("Colisión detectada: Persona colisiona con pared -", bodyB.label);
+      }
+      
+      if (personaB && (bodyA.label === "piso" || bodyA.label === "techo" || bodyA.label === "paredIzquierda" || bodyA.label === "paredDerecha")) {
+        console.log("Colisión detectada: Persona colisiona con pared -", bodyA.label);
+      }
     }
   }
   async initPIXI() {
@@ -96,6 +123,7 @@ class Juego {
       height: this.height,
       antialias: true,
       resolution: 1,
+      resizeTo: window,
     };
     await this.pixiApp.init(opcionesDePixi);
     document.body.appendChild(this.pixiApp.canvas);
@@ -107,6 +135,10 @@ class Juego {
     this.containerAsesino.zIndex = Z_INDEX.containerAsesino;
     this.containerAsesino.position.set(0, 0);
     this.pixiApp.stage.addChild(this.containerAsesino);
+    this.containerDebug = new PIXI.Container();
+    this.containerDebug.label = "containerDebug";
+    this.containerDebug.zIndex = Z_INDEX.containerDebug;
+    this.pixiApp.stage.addChild(this.containerDebug);
     this.crearNivel();
     this.targetCamara = this.protagonista;
   }
@@ -114,6 +146,7 @@ class Juego {
     this.containerPrincipal = new PIXI.Container();
     this.containerPrincipal.label = "containerPrincipal";
     this.containerPrincipal.zIndex = Z_INDEX.containerPrincipal;
+    this.containerPrincipal.sortableChildren = true;
     this.containerPrincipal.position.set(0, 0);
     this.pixiApp.stage.addChild(this.containerPrincipal);
     this.crearFondo();
@@ -208,12 +241,37 @@ class Juego {
     this.containerPrincipal.y = targetY;
   }
   finDelJuego() {
-    alert("Te moriste! fin del juego");
+    alert("Te moriste! fin del juego. Tu puntaje final es: " + this.score);
+  }
+  dibujarCollidersDebug() {
+    this.containerDebug.removeChildren();
+    const bodies = Matter.Composite.allBodies(this.engine.world);
+    
+    for (let body of bodies) {
+      const graphics = new PIXI.Graphics();
+      graphics.lineStyle(2, 0xFF0000, 0.8);
+      graphics.beginFill(0xFFFFFF, 0.1);
+      
+      const vertices = body.vertices;
+      if (vertices && vertices.length > 0) {
+        graphics.moveTo(vertices[0].x, vertices[0].y);
+        for (let i = 1; i < vertices.length; i++) {
+          graphics.lineTo(vertices[i].x, vertices[i].y);
+        }
+        graphics.lineTo(vertices[0].x, vertices[0].y);
+      }
+      
+      graphics.endFill();
+      this.containerDebug.addChild(graphics);
+    }
   }
 
   gameLoop(time) {
     for (let unpersona of this.personas) unpersona.tick();
     for (let unpersona of this.personas) unpersona.render();
+    if (this.mostrarCollidersDebug) {
+      this.dibujarCollidersDebug();
+    }
     if (this.protagonista) {
       const offsetX = this.width / 4.4 - this.protagonista.posicion.x;
       const offsetY = this.height / 4.4 - this.protagonista.posicion.y;
@@ -221,6 +279,8 @@ class Juego {
       this.containerPrincipal.y = offsetY;
       this.containerAsesino.x = offsetX;
       this.containerAsesino.y = offsetY;
+      this.containerDebug.x = offsetX;
+      this.containerDebug.y = offsetY;
     }
   }
 }

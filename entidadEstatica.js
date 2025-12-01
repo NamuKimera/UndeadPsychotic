@@ -4,9 +4,6 @@ class EntidadEstatica extends GameObject {
     this.radio = 20;
     this.sprite = null;
     this.render();
-    this.ancho = 100;
-    this.alto = 100;
-    this.crearCajitaDeMatterJS();
   }
 
   calcularRadio() {
@@ -15,13 +12,17 @@ class EntidadEstatica extends GameObject {
 
   crearCajitaDeMatterJS() {
     this.body = Matter.Bodies.rectangle(
-      this.posicion.x,
-      this.posicion.y,
-      this.ancho * 0.8,
-      this.alto * 0.8,
+      this.posicion.x - this.ancho * 0.5,
+      this.posicion.y - this.alto * 0.5,
+      this.ancho,
+      this.alto,
       { isStatic: true, restitution: 0.1, friction: 0.1, frictionAir: 0.01 }
     );
     this.body.angle = Math.random() * 3;
+    this.body.gameObject = this;
     Matter.Composite.add(this.juego.engine.world, [this.body]);
+  }
+
+  tick() {
   }
 }

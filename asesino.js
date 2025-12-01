@@ -2,7 +2,7 @@ class Asesino extends Persona {
   constructor(textureData, x, y, juego) {
     super(x, y, juego);
     // Configuración especial del protagonista
-    this.vida = 10;
+    this.vida = 100;
     this.vision = 100; // Visión ilimitada
     this.cargarSpritesAnimados(textureData, 15);
     this.cambiarAnimacion("idleAbajo")

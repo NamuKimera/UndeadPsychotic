@@ -3,6 +3,8 @@ class Local extends EntidadEstatica {
         super(x, y, juego);
         this.radio = 10;
         this.scaleX = scaleX || 1;
+        this.ancho = 200;
+        this.alto = 180;
         this.container.label = "local" + this.id;
         this.crearSprite();
     }
