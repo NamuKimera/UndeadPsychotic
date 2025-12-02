@@ -1,6 +1,5 @@
 const Z_INDEX = {
   containerPrincipal: 3,
-  containerAsesino: 5,
   containerDebug: 10,
 };
 
@@ -130,11 +129,6 @@ class Juego {
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
     this.agregarInteractividadDelMouse();
     this.pixiApp.stage.sortableChildren = true;
-    this.containerAsesino = new PIXI.Container();
-    this.containerAsesino.label = "containerAsesino";
-    this.containerAsesino.zIndex = Z_INDEX.containerAsesino;
-    this.containerAsesino.position.set(0, 0);
-    this.pixiApp.stage.addChild(this.containerAsesino);
     this.containerDebug = new PIXI.Container();
     this.containerDebug.label = "containerDebug";
     this.containerDebug.zIndex = Z_INDEX.containerDebug;
@@ -233,7 +227,12 @@ class Juego {
     };
   }
   finDelJuego() {
-    alert("Te moriste! fin del juego. Tu puntaje final es: " + this.score);
+    if(this.protagonista.vida <= 0){
+      alert("Te moriste! fin del juego. Tu puntaje final es: " + this.score);
+    }
+    if(this.personas.length == 10){
+      alert("Ganaste! mataste a todos los ciudadanos. Tu puntaje final es: " + this.score);
+    }
   }
   dibujarCollidersDebug() {
     this.containerDebug.removeChildren();
@@ -265,16 +264,14 @@ class Juego {
       this.dibujarCollidersDebug();
     }
     if (this.protagonista) {
-      const offsetX = this.width / 4.4 - this.protagonista.posicion.x;
-      const offsetY = this.height / 4.4 - this.protagonista.posicion.y;
+      const offsetX = this.width / 4 - this.protagonista.posicion.x;
+      const offsetY = this.height / 4 - this.protagonista.posicion.y;
       if (offsetX < 0 && offsetX > window.innerWidth - this.width) {
         this.containerPrincipal.x = offsetX;
-        this.containerAsesino.x = offsetX;
         this.containerDebug.x = offsetX;
       }
       if (offsetY < 0 && offsetY > window.innerHeight - this.height) {
         this.containerPrincipal.y = offsetY;
-        this.containerAsesino.y = offsetY;
         this.containerDebug.y = offsetY;
       }
     }

@@ -79,19 +79,6 @@ class Persona extends GameObject {
       this.container.addChild(this.spritesAnimados[key]);
     }
   }
-  cambiarDeSpriteAnimadoSegunAngulo() {
-    if ((this.angulo > 315 && this.angulo < 360) || this.angulo < 45) {
-      this.cambiarAnimacion("caminarDerecha");
-      this.spritesAnimados.caminarDerecha.scale.x = -15;
-    } else if (this.angulo > 135 && this.angulo < 225) {
-      this.cambiarAnimacion("caminarDerecha");
-      this.spritesAnimados.caminarDerecha.scale.x = 15;
-    } else if (this.angulo < 135 && this.angulo > 45) {
-      this.cambiarAnimacion("caminarArriba");
-    } else {
-      this.cambiarAnimacion("caminarAbajo");
-    }
-  }
   cambiarVelocidadDeAnimacionSegunVelocidadLineal() {
     const keys = Object.keys(this.spritesAnimados);
     for (let key of keys) {
@@ -222,7 +209,6 @@ class Persona extends GameObject {
   render() {
     super.render();
     this.actualizarBodyDesdePosicion();
-    this.cambiarDeSpriteAnimadoSegunAngulo()
     this.cambiarVelocidadDeAnimacionSegunVelocidadLineal();
     this.verificarSiEstoyMuerto();
   }

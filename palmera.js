@@ -4,7 +4,7 @@ class Palmera extends EntidadEstatica {
         this.radio = 20;
         this.scaleX = scaleX || 1;
         this.scaleY = scaleY || 1;
-        this.ancho = 80;
+        this.ancho = 190;
         this.alto = 120;
         this.container.label = "Palmera" + this.id;
         this.crearSprite();
