@@ -1,5 +1,6 @@
 # Arreglos Pendientes
 
-- Camara
-- Persecucion Asesino por policias
-- Escape Civiles al ver al asesino
+- Crear Particulas de muerte
+- Arreglar Sprites de las Personas
+- Crear UI para el juego
+- Agregar sonidos a las particulas
